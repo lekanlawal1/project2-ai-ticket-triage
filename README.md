@@ -1,6 +1,6 @@
 # AI Support Ticket Triage — LLM Pipeline with Guardrails
 
-**Live demo:** _deploying — link coming after Streamlit Cloud setup_ · **Stack:** Python · Gemini 3 Flash (structured output) · Streamlit · pandas
+**Live demo:** https://project2-ai-ticket-triage-ubf6qjhxmukei7tzjp5xgo.streamlit.app · **Stack:** Python · Gemini 3 Flash (structured output) · Streamlit · pandas
 
 ## Problem statement
 
