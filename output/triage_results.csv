@@ -1,0 +1,172 @@
+ticket_id,category,priority,confidence,routing_recommendation,auto_routed,route,status,failure_reason,attempts,latency_s
+TKT-0001,account_access,low,0.95,Support Tier 1 should handle this routine user provisioning request for a new team member.,True,account_access,ok,,1,2.84
+TKT-0002,account_access,urgent,0.98,Security team should handle this immediately to deprovision admin access for a former employee and mitigate potential security risks.,True,account_access,ok,,1,4.54
+TKT-0003,billing,high,0.95,Route to Billing Ops to investigate the failed transaction and prevent service interruption for a paying customer.,True,billing,ok,,1,2.66
+TKT-0004,account_access,urgent,0.98,Security team should handle this to verify the user's identity and reset the 2FA configuration as they are currently fully blocked.,True,account_access,ok,,1,2.6
+TKT-0005,technical_bug,medium,0.95,Engineering On-call to investigate the climbing error rate and potential service degradation on the /v2/reports API endpoint.,True,technical_bug,ok,,1,3.03
+TKT-0006,spam,low,1.0,None because this is a phishing attempt containing a malicious executable attachment.,True,spam,ok,,1,2.46
+TKT-0007,billing,high,0.95,Billing Ops should handle this as it involves missing tax information on invoices required for a compliance deadline.,True,billing,ok,,1,3.56
+TKT-0008,account_access,urgent,1.0,Support Tier 1 should handle this immediately to unlock the account before the user's client demo deadline.,True,account_access,ok,,1,2.19
+TKT-0009,billing,high,0.95,Route to Billing Ops to address the discrepancy between the sales promise and the annual contract terms regarding API access.,True,billing,ok,,1,2.98
+TKT-0010,billing,high,0.95,Route to Billing Ops to investigate the declined transaction and assist the customer with alternative payment options to prevent service loss.,True,billing,ok,,1,2.46
+TKT-0011,feature_request,low,1.0,Route to the Product team as this is a request for a new bulk editing capability to improve workflow efficiency.,True,feature_request,ok,,1,3.58
+TKT-0012,billing,medium,0.95,Route to Billing Ops to address questions regarding proration and annual billing discounts for a potential plan upgrade.,True,billing,ok,,1,1.95
+TKT-0013,billing,medium,1.0,"Billing Ops should handle this as it involves subscription upgrades, proration policies, and annual billing discounts.",True,billing,ok,,1,2.38
+TKT-0014,spam,low,1.0,None because this is an unsolicited sales pitch unrelated to customer support.,True,spam,ok,,1,2.57
+TKT-0015,spam,low,1.0,None because this is a standard phishing/scam email unrelated to the business.,True,spam,ok,,1,2.13
+TKT-0016,billing,high,0.95,Billing Ops because the ticket involves an unresolved billing error and an explicit churn threat from a paying customer.,True,billing,ok,,1,2.7
+TKT-0017,feature_request,low,1.0,Route to the Product team as this is a request for a new automated export capability and a roadmap inquiry.,True,feature_request,ok,,1,1.9
+TKT-0018,billing,high,0.95,Billing Ops should handle this request to process the Enterprise subscription cancellation and confirm with the customer.,True,billing,ok,,1,2.27
+TKT-0019,complaint,high,0.9,Support Tier 1 to address the customer's dissatisfaction with service reliability and provide an update on platform stability efforts.,True,complaint,ok,,1,4.35
+TKT-0020,complaint,high,0.9,Support Tier 1 to address the customer's frustration and relay the UI feedback to the Product team to mitigate churn risk.,True,complaint,ok,,1,3.75
+TKT-0021,billing,high,1.0,Route to Billing Ops to investigate and process the refund for the duplicate charges identified by invoice numbers INV-22280 and INV-38657.,True,billing,ok,,1,2.85
+TKT-0022,billing,low,1.0,Route to Billing Ops to provide clarification on the specific invoice line item requested by the customer.,True,billing,ok,,1,2.13
+TKT-0023,technical_bug,medium,0.95,Engineering On-call should investigate the report builder search functionality as it is failing to return existing records.,True,technical_bug,ok,,1,2.47
+TKT-0024,complaint,high,0.95,Support Tier 1 to address the customer's frustration and Product to review feedback on the export tool redesign.,True,complaint,ok,,1,2.49
+TKT-0025,technical_bug,medium,0.95,Support Tier 1 to investigate the unresponsive save button in the profile settings and verify if the issue is browser-specific.,True,technical_bug,ok,,1,5.11
+TKT-0026,account_access,urgent,1.0,Support Tier 1 should handle this to initiate the identity verification and 2FA reset process for a blocked user.,True,account_access,ok,,1,3.38
+TKT-0027,billing,high,1.0,Billing Ops should handle this as it involves recurring incorrect charges after cancellation and a refund request.,True,billing,ok,,1,2.41
+TKT-0028,technical_bug,medium,0.95,Route to Engineering On-call to investigate the 500 errors on the /v2/reports endpoint and check for a related incident.,True,technical_bug,ok,,1,3.66
+TKT-0029,technical_bug,medium,0.95,Route to Engineering On-call to investigate the ERR_TIMEOUT and performance degradation on the billing page.,True,technical_bug,ok,,1,3.23
+TKT-0030,feature_request,low,1.0,Route to Product team as this is a request for a new UI capability to improve user experience.,True,feature_request,ok,,1,5.77
+TKT-0031,feature_request,low,1.0,Route to the Product team as this is a request for new keyboard shortcut functionality to improve user workflow.,True,feature_request,ok,,1,7.08
+TKT-0032,spam,low,1.0,None because this is an unsolicited sales pitch and should be filtered as spam.,True,spam,ok,,1,2.13
+TKT-0033,technical_bug,high,0.95,Engineering On-call to investigate the data discrepancy between the API and CSV export as it affects financial reporting.,True,technical_bug,ok,,1,9.29
+TKT-0034,complaint,high,0.9,Route to Billing Ops to address the customer's dissatisfaction with the price increase and manage the potential churn risk.,True,complaint,ok,,1,11.54
+TKT-0035,billing,high,1.0,Billing Ops to review the refund request for the post-trial charge.,True,billing,ok,,1,3.7
+TKT-0036,spam,low,1.0,None for spam as this is an unsolicited sales pitch unrelated to customer support.,True,spam,ok,,1,2.4
+TKT-0037,feature_request,low,1.0,Route to the Product team as this is a request for a new bulk editing capability that could lead to a plan upgrade.,True,feature_request,ok,,1,4.57
+TKT-0038,technical_bug,medium,0.95,Engineering On-call should investigate the climbing error rate on the /v2/reports endpoint to prevent a full service outage.,True,technical_bug,ok,,1,4.25
+TKT-0039,account_access,urgent,0.98,Support Tier 1 should handle this to verify the user's identity and resolve the login blockage.,True,account_access,ok,,1,4.67
+TKT-0040,spam,low,0.95,None for spam as this is a media inquiry unrelated to customer support or product issues.,True,spam,ok,,1,2.35
+TKT-0041,technical_bug,medium,0.3,Support Tier 1 should handle this to gather more information as the ticket is too vague to determine the specific issue.,False,human_review,ok,confidence 0.30 < 0.75,1,2.89
+TKT-0042,technical_bug,low,0.95,Support Tier 1 should handle this as it is a minor cosmetic typo in a system-generated email.,True,technical_bug,ok,,1,3.27
+TKT-0043,technical_bug,medium,0.7,Route to Support Tier 1 to investigate the browser-specific rendering issue and clarify the conflicting browser information between the subject and body.,False,human_review,ok,confidence 0.70 < 0.75,1,8.11
+TKT-0044,account_access,high,0.95,Route to Support Tier 1 to investigate the SSO configuration and escalate to Engineering if a systemic authentication loop is confirmed.,True,account_access,ok,,1,4.21
+TKT-0045,billing,high,0.95,Route to Billing Ops to resolve the underlying billing error and address the churn threat from this high-value customer.,True,billing,ok,,1,6.35
+TKT-0046,technical_bug,medium,0.9,Support Tier 1 to investigate browser-specific rendering issues and clarify the discrepancy between the subject and body reports.,True,technical_bug,ok,,1,10.17
+TKT-0047,billing,high,0.95,Billing Ops to ensure the VAT number is correctly reflected on the PDF invoices before the quarterly deadline.,True,billing,ok,,1,4.15
+TKT-0048,technical_bug,medium,0.95,Route to Engineering On-call to investigate the search indexing failure on the billing page.,True,technical_bug,ok,,1,3.64
+TKT-0049,account_access,high,0.95,Route to Support Tier 1 to investigate the SSO configuration and escalate to Engineering if a systemic authentication loop is confirmed.,True,account_access,ok,,2,12.39
+TKT-0050,feature_request,low,1.0,Route to the Product team as this is a request for a new UI capability to improve user experience.,True,feature_request,ok,,1,3.34
+TKT-0051,billing,low,0.95,"Route to Billing Ops to answer specific questions regarding subscription upgrades, proration, and annual billing discounts.",True,billing,ok,,1,4.78
+TKT-0052,spam,low,1.0,None because this is an unsolicited sales pitch unrelated to the product or customer support.,True,spam,ok,,1,2.55
+TKT-0053,feature_request,low,1.0,Route to Product team as this is a request for a new automated reporting capability and an inquiry about the roadmap.,True,feature_request,ok,,2,11.37
+TKT-0054,spam,low,1.0,None because this is a standard phishing scam unrelated to the business.,True,spam,ok,,1,2.54
+TKT-0055,account_access,high,0.95,Support Tier 1 should investigate the SSO configuration as half the team is currently unable to log in.,True,account_access,ok,,1,7.61
+TKT-0056,account_access,urgent,0.95,Security team should handle this to revoke admin access for a former employee and mitigate potential security risks.,True,account_access,ok,,1,9.29
+TKT-0057,billing,high,0.98,Route to Billing Ops to investigate and process the refund for the duplicate charges identified by the user.,True,billing,ok,,1,9.92
+TKT-0058,technical_bug,medium,0.95,Engineering On-call should investigate this regression in the export functionality likely caused by the recent update.,True,technical_bug,ok,,1,6.31
+TKT-0059,account_access,urgent,0.95,Security or Support Tier 1 because the user is completely locked out of their account and requires identity verification to reset 2FA.,True,account_access,ok,,1,4.11
+TKT-0060,complaint,high,0.9,Support Tier 1 to address the customer's frustration and escalate the UX feedback to the Product team.,True,complaint,ok,,1,3.65
+TKT-0061,account_access,medium,0.4,Support Tier 1 should contact the user to clarify the specific nature of the account issue as the request is currently too vague.,False,human_review,ok,confidence 0.40 < 0.75,1,22.11
+TKT-0062,billing,high,0.95,Route to Billing Ops to resolve the underlying charge error and address the customer's churn threat.,True,billing,ok,,1,4.06
+TKT-0063,account_access,urgent,0.95,Route to Support Tier 1 to assist with manual password reset or email deliverability troubleshooting for a blocked user.,True,account_access,ok,,1,3.9
+TKT-0064,feature_request,low,0.95,Route to the Product team as the user is inquiring about and requesting a new QuickBooks integration.,True,feature_request,ok,,1,3.49
+TKT-0065,account_access,urgent,1.0,Support Tier 1 should handle this immediately as the user is fully blocked from their account and has a time-sensitive client demo.,True,account_access,ok,,1,3.28
+TKT-0066,technical_bug,medium,0.9,Route to Support Tier 1 to troubleshoot the unresponsive UI element on the Edge browser and verify if this is a systemic bug.,True,technical_bug,ok,,1,5.12
+TKT-0067,account_access,urgent,1.0,Route to Security immediately as the user reports a suspected account compromise and unauthorized login activity.,True,account_access,ok,,1,8.0
+TKT-0068,spam,low,1.0,None because this is a standard phishing scam unrelated to the business.,True,spam,ok,,1,6.79
+TKT-0069,account_access,urgent,1.0,Support Tier 1 should handle this immediately to unlock the account before the user's time-sensitive client demo.,True,account_access,ok,,1,5.2
+TKT-0070,billing,high,0.95,Route to Billing Ops to process the requested refund and investigate why the subscription remains active after cancellation.,True,billing,ok,,1,4.73
+TKT-0071,feature_request,low,1.0,Route to the Product team as this is a request for a new UI capability to improve user experience.,True,feature_request,ok,,1,4.09
+TKT-0072,spam,low,1.0,None for spam as this is a phishing attempt containing a malicious executable attachment.,True,spam,ok,,1,3.89
+TKT-0073,feature_request,low,1.0,Route to the Product team as this is a request for a new bulk editing capability to improve workflow efficiency.,True,feature_request,ok,,1,2.65
+TKT-0074,complaint,high,0.85,Support Tier 1 should handle this to address the customer's frustration and churn risk while relaying the UI feedback to the Product team.,True,complaint,ok,,1,6.89
+TKT-0075,complaint,high,0.9,Support Tier 1 to handle the escalation and address the customer's dissatisfaction regarding service reliability and communication.,True,complaint,ok,,1,6.6
+TKT-0076,account_access,low,0.95,Support Tier 1 should handle this as it is a routine user provisioning request for a new team member.,True,account_access,ok,,1,9.45
+TKT-0077,billing,high,1.0,Route to Billing Ops to process the subscription cancellation as requested by the customer.,True,billing,ok,,1,2.94
+TKT-0078,billing,low,0.98,Route to Billing Ops to provide clarification on the specific invoice line item and usage metrics.,True,billing,ok,,1,3.96
+TKT-0079,billing,high,0.8,Billing Ops to address the request for grandfathering and mitigate the churn threat.,True,billing,ok,,1,9.22
+TKT-0080,technical_bug,high,0.95,Route to Engineering On-call to investigate the data discrepancy between the UI and CSV export as it impacts financial reporting.,True,technical_bug,ok,,1,4.61
+TKT-0081,feature_request,low,1.0,Route to Product as the user is requesting a new automated export capability and inquiring about the product roadmap.,True,feature_request,ok,,1,8.59
+TKT-0082,technical_bug,medium,0.95,Support Tier 1 should investigate the ERR_TIMEOUT error and attempt to reproduce the notification freeze on Firefox.,True,technical_bug,ok,,1,6.49
+TKT-0083,technical_bug,medium,0.95,Route to Engineering On-call to investigate intermittent 500 errors and potential regression in the /v2/reports endpoint.,True,technical_bug,ok,,1,6.95
+TKT-0084,technical_bug,medium,0.7,Route to Support Tier 1 to troubleshoot the unresponsive save button in Firefox and assist with the email update before the user's deadline.,False,human_review,ok,confidence 0.70 < 0.75,1,13.11
+TKT-0085,spam,low,1.0,None because this is an unsolicited sales pitch and should be filtered as spam.,True,spam,ok,,1,6.56
+TKT-0086,billing,high,1.0,Route to Billing Ops to evaluate the refund request for the accidental subscription charge.,True,billing,ok,,1,2.46
+TKT-0087,billing,medium,0.95,"Route to Billing Ops to address questions regarding subscription upgrades, proration, and annual billing discounts.",True,billing,ok,,1,7.68
+TKT-0088,spam,low,1.0,None because this is an unsolicited sales pitch unrelated to the customer's account or product.,True,spam,ok,,1,9.94
+TKT-0089,spam,low,1.0,None because this is an unsolicited sales pitch unrelated to the customer's account or product.,True,spam,ok,,1,2.46
+TKT-0090,billing,high,0.95,Route to Billing Ops to address the contractual dispute regarding API access and pricing promised during the sales process.,True,billing,ok,,1,3.6
+TKT-0091,technical_bug,medium,0.95,Route to Engineering On-call to investigate a potential regression in the export functionality following the recent update.,True,technical_bug,ok,,1,4.6
+TKT-0092,billing,high,0.95,Route to Billing Ops to resolve the discrepancy between the user's paid Pro subscription and their current Starter account status.,True,billing,ok,,1,2.66
+TKT-0093,technical_bug,medium,0.95,Support Tier 1 should investigate the 403 error and performance lag in the export tool since the user has a workaround.,True,technical_bug,ok,,1,9.42
+TKT-0094,billing,high,1.0,Route to Billing Ops to investigate the duplicate invoice numbers and process the requested refund.,True,billing,ok,,1,4.2
+TKT-0095,technical_bug,medium,0.95,Route to Engineering On-call to investigate a browser-specific rendering bug in the report builder.,True,technical_bug,ok,,2,12.61
+TKT-0096,technical_bug,urgent,0.98,Engineering On-call because the export service is returning 502 errors and blocking a team's time-sensitive deliverable.,True,technical_bug,ok,,1,6.46
+TKT-0097,billing,urgent,0.9,Route to Billing Ops to investigate account suspension and resolve the disputed invoice that is blocking user access.,True,billing,ok,,1,10.04
+TKT-0098,feature_request,low,1.0,Route to the Product team as this is a request for a new user interface capability.,True,feature_request,ok,,1,3.53
+TKT-0099,billing,high,1.0,Route to Billing Ops to process the requested refund and investigate why the subscription remains active after the reported cancellation.,True,billing,ok,,1,2.88
+TKT-0100,billing,high,0.9,"Route to Billing Ops because the ticket mentions an incorrect charge date, which takes precedence over other feedback per tie-breaking rules.",True,billing,ok,,1,4.14
+TKT-0101,feature_request,low,0.95,Route to Product as the user is requesting a new integration with QuickBooks or clarification on its availability.,True,feature_request,ok,,1,2.98
+TKT-0102,billing,high,0.6,Route to Billing Ops to process the subscription cancellation request.,False,human_review,ok,confidence 0.60 < 0.75,1,3.69
+TKT-0103,technical_bug,low,0.95,Support Tier 1 to log a minor cosmetic bug for the engineering team to update the email template.,True,technical_bug,ok,,1,3.8
+TKT-0104,feature_request,low,1.0,Route to the Product team to evaluate the demand for white-labeling and custom branding features.,True,feature_request,ok,,1,4.21
+TKT-0105,feature_request,low,1.0,Route to the Product team as this is a request for new keyboard shortcut functionality in the mobile application.,True,feature_request,ok,,1,6.37
+TKT-0106,technical_bug,medium,0.95,Engineering On-call should investigate the unresponsive save button in the account settings UI specifically for Firefox users.,True,technical_bug,ok,,1,4.38
+TKT-0107,account_access,high,0.95,Support Tier 1 should investigate the SSO configuration as half the team is currently unable to log in.,True,account_access,ok,,1,5.6
+TKT-0108,feature_request,low,1.0,Route to the Product team to evaluate the demand for white-labeling and custom branding features.,True,feature_request,ok,,1,3.33
+TKT-0109,account_access,high,0.95,Support Tier 1 to deactivate the former employee's admin account to mitigate security risks.,True,account_access,ok,,1,5.09
+TKT-0110,billing,high,0.95,Route to Billing Ops to investigate the failed transaction and prevent service interruption for a paying customer.,True,billing,ok,,1,7.42
+TKT-0111,spam,low,1.0,None because this is a phishing attempt containing a malicious executable attachment.,True,spam,ok,,1,2.47
+TKT-0112,technical_bug,high,0.95,Route to Engineering On-call because a core feature is returning 500 errors and blocking a team's time-sensitive deliverables.,True,technical_bug,ok,,1,2.97
+TKT-0113,technical_bug,medium,0.6,Support Tier 1 to investigate whether the reported slowness is a local client issue or a broader system performance degradation.,False,human_review,ok,confidence 0.60 < 0.75,1,3.29
+TKT-0114,billing,high,1.0,Billing Ops to process the requested refund and investigate why the subscription remains active after cancellation.,True,billing,ok,,1,4.62
+TKT-0115,technical_bug,medium,0.95,Engineering On-call should investigate the search indexing or query logic in the report builder as it fails to return exact matches.,True,technical_bug,ok,,1,4.82
+TKT-0116,account_access,urgent,0.98,Security because it involves deprovisioning an admin account for a former employee to mitigate potential security risks.,True,account_access,ok,,1,9.03
+TKT-0117,billing,high,0.95,Route to Billing Ops to address the discrepancy between the sales promise and the current contract terms.,True,billing,ok,,1,3.58
+TKT-0118,technical_bug,medium,0.95,"Route to Engineering On-call as the search functionality in the report builder is failing to return valid results, indicating a functional defect.",True,technical_bug,ok,,1,4.41
+TKT-0119,spam,low,1.0,None because this is an unsolicited sales pitch and should be filtered as spam.,True,spam,ok,,1,2.57
+TKT-0120,technical_bug,medium,0.2,Support Tier 1 should handle this to investigate previous communication history and identify the specific issue being referenced.,False,human_review,ok,confidence 0.20 < 0.75,1,8.31
+TKT-0121,technical_bug,high,0.95,Route to Engineering On-call as a team is blocked by a specific parsing error affecting a time-sensitive deliverable.,True,technical_bug,ok,,1,3.13
+TKT-0122,technical_bug,high,0.95,Engineering On-call to investigate the data discrepancy between the dashboard and export for financial reporting accuracy.,True,technical_bug,ok,,1,9.06
+TKT-0123,billing,high,0.9,Billing Ops should handle this as it involves a dispute over contract terms and plan inclusions following a sales interaction.,True,billing,ok,,1,6.97
+TKT-0124,account_access,urgent,0.9,Security should handle this immediately due to the suspected account compromise and reported data loss.,True,account_access,ok,,1,6.83
+TKT-0125,feature_request,low,0.95,Route to Product as this is a request for a new white-labeling capability for PDF exports.,True,feature_request,ok,,1,4.65
+TKT-0126,account_access,urgent,0.95,Support Tier 1 should handle this as the user is fully blocked from accessing their account due to password reset failures.,True,account_access,ok,,1,5.84
+TKT-0127,spam,low,1.0,None because this is a standard phishing/scam email unrelated to the business.,True,spam,ok,,1,3.16
+TKT-0128,account_access,urgent,0.98,Security team should handle this to manage account recovery and 2FA verification for a blocked user.,True,account_access,ok,,1,4.18
+TKT-0129,complaint,high,0.95,Route to Support Tier 1 for escalation and high-touch communication to address the customer's dissatisfaction with service reliability and prevent churn.,True,complaint,ok,,1,4.36
+TKT-0130,billing,high,1.0,Billing Ops should process this cancellation request to prevent further charges and manage the customer churn.,True,billing,ok,,1,9.67
+TKT-0131,billing,high,1.0,Route to Billing Ops to process the Enterprise subscription cancellation as requested.,True,billing,ok,,1,2.58
+TKT-0132,spam,low,1.0,None for spam as this is a phishing attempt containing a malicious executable attachment.,True,spam,ok,,1,3.32
+TKT-0133,technical_bug,medium,0.95,Route to Engineering On-call as this appears to be a regression in the report export feature following a recent deployment.,True,technical_bug,ok,,1,4.13
+TKT-0134,feature_request,low,0.95,Route to Product team as this is a request for a new QuickBooks integration not currently listed on the integrations page.,True,feature_request,ok,,1,3.17
+TKT-0135,billing,high,1.0,Route to Billing Ops to process the refund request for the post-trial charge.,True,billing,ok,,1,2.38
+TKT-0136,feature_request,low,0.95,Route to Product to track the request for a QuickBooks integration and provide information on the current roadmap.,True,feature_request,ok,,1,4.71
+TKT-0137,spam,low,1.0,None because this is an unsolicited sales pitch unrelated to the customer's account or product.,True,spam,ok,,1,2.08
+TKT-0138,billing,high,1.0,Route to Billing Ops to investigate and process the refund for the duplicate charges identified by the provided invoice numbers.,True,billing,ok,,1,4.5
+TKT-0139,billing,high,0.95,Billing Ops should handle this immediately as it involves a financial error and a churn threat from a high-value customer.,True,billing,ok,,1,5.95
+TKT-0140,billing,high,0.8,Billing Ops to address the request for grandfathering and mitigate the churn threat.,True,billing,ok,,1,11.17
+TKT-0141,account_access,urgent,0.98,Support Tier 1 should handle this as the user is currently blocked from accessing their account due to a failure in the password reset system.,True,account_access,ok,,1,5.02
+TKT-0142,account_access,low,0.95,Route to Support Tier 1 for standard user provisioning and access management.,True,account_access,ok,,1,2.57
+TKT-0143,spam,low,1.0,None for spam as this is an unsolicited sales pitch unrelated to customer support.,True,spam,ok,,1,2.83
+TKT-0144,billing,high,0.9,"Route to Billing Ops because the missing invoice involves financial compliance and a deadline, which takes priority over the demo request.",True,billing,ok,,1,4.45
+TKT-0145,spam,low,1.0,None because this is an unsolicited sales pitch unrelated to customer support.,True,spam,ok,,1,9.23
+TKT-0146,feature_request,low,1.0,Route to Product as the customer is requesting a new automated export capability and roadmap information.,True,feature_request,ok,,1,5.03
+TKT-0147,billing,high,0.95,Route to Billing Ops to ensure VAT information is correctly mapped to invoice PDFs before the quarterly tax deadline.,True,billing,ok,,1,3.08
+TKT-0148,billing,high,1.0,Route to Billing Ops to investigate the declined transaction and prevent service interruption for the customer.,True,billing,ok,,1,2.91
+TKT-0149,account_access,low,1.0,Route to Support Tier 1 for manual user provisioning as requested by the customer.,True,account_access,ok,,1,2.2
+TKT-0150,account_access,urgent,1.0,Support Tier 1 should handle this immediately to unlock the account before the user's client demo deadline.,True,account_access,ok,,1,2.89
+TKT-0151,billing,high,0.85,Route to Billing Ops to address the contract inquiry and coordinate data export procedures for the departing customer.,True,billing,ok,,1,9.37
+TKT-0152,technical_bug,low,0.95,Route to Support Tier 1 to log a minor cosmetic bug for the engineering team to fix the typo in the email template.,True,technical_bug,ok,,1,3.86
+TKT-0153,feature_request,low,1.0,Route to the Product team as this is a request for new keyboard shortcut functionality to improve user workflow.,True,feature_request,ok,,1,3.67
+TKT-0154,billing,high,1.0,Route to Billing Ops to ensure VAT compliance on generated invoice PDFs before the quarterly deadline.,True,billing,ok,,1,3.79
+TKT-0155,feature_request,low,1.0,Route to the Product team as this is a request for new functionality to enhance mobile app usability.,True,feature_request,ok,,1,2.88
+TKT-0156,billing,low,1.0,Route to Billing Ops to provide clarification on the specific invoice line item and usage metrics.,True,billing,ok,,1,3.61
+TKT-0157,technical_bug,urgent,0.65,Route to Engineering On-call as the user reports a blocking technical error affecting their entire team's workflow and a same-day deadline.,False,human_review,ok,confidence 0.65 < 0.75,1,6.56
+TKT-0158,technical_bug,low,0.95,Route to Support Tier 1 to log a minor cosmetic bug for the engineering team to update the email template copy.,True,technical_bug,ok,,1,3.5
+TKT-0159,billing,high,0.95,Route to Billing Ops to investigate the discrepancy between the UI and CSV export for financial reporting accuracy.,True,billing,ok,,1,2.46
+TKT-0160,technical_bug,medium,0.95,Route to Engineering On-call to investigate the ERR_TIMEOUT error and performance degradation in the notifications module.,True,technical_bug,ok,,1,2.79
+TKT-0161,technical_bug,medium,0.7,Route to Engineering On-call to investigate the browser-specific rendering failure on the admin console.,False,human_review,ok,confidence 0.70 < 0.75,1,4.9
+TKT-0162,feature_request,low,0.95,Route to Product as this is a request for a new white-labeling capability for PDF exports.,True,feature_request,ok,,1,10.44
+TKT-0163,billing,high,1.0,Route to Billing Ops to evaluate the refund request for the accidental subscription charge.,True,billing,ok,,1,3.28
+TKT-0164,technical_bug,medium,0.95,Route to Engineering On-call to investigate a potential regression in the report export feature following a recent update.,True,technical_bug,ok,,1,3.46
+TKT-0165,billing,high,0.95,Route to Billing Ops to investigate the pricing discrepancy and prevent an incorrect charge before the Friday deadline.,True,billing,ok,,1,5.96
+TKT-0166,technical_bug,medium,0.7,Support Tier 1 should investigate whether the missing saved filters are a technical regression from the update or an intentional feature removal.,False,human_review,ok,confidence 0.70 < 0.75,1,10.77
+TKT-0167,complaint,high,0.85,Billing Ops to address the dissatisfaction regarding price fairness and mitigate the churn risk before the June renewal.,True,complaint,ok,,1,8.64
+TKT-0168,spam,low,1.0,None because this is an unsolicited sales pitch and should be filtered as spam.,True,spam,ok,,1,2.74
+TKT-0169,complaint,high,0.95,Route to Support Tier 1 for escalation and high-touch communication to address the customer's dissatisfaction with service reliability and prevent churn.,True,complaint,ok,,1,4.28
+TKT-0170,billing,low,0.98,Route to Billing Ops to provide clarification on the specific invoice line item and usage charges.,True,billing,ok,,1,5.67
+TKT-0171,feature_request,low,1.0,Route to the Product team as this is a request for a new bulk editing capability to improve workflow efficiency.,True,feature_request,ok,,1,2.48

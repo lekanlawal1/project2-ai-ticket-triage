@@ -1,0 +1,11 @@
+# Secrets — never commit API keys
+.env
+.streamlit/secrets.toml
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
