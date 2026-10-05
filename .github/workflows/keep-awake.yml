@@ -1,0 +1,40 @@
+name: Keep the live demo awake
+
+# Streamlit Community Cloud puts an app to sleep after a stretch with no visitors, and the
+# first visitor then waits for it to wake. This opens the app in a headless browser every
+# 6 hours, which counts as a visit (and wakes it if it fell asleep anyway).
+on:
+  schedule:
+    # Off the hour because GitHub delays jobs scheduled at :00 when load is high.
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  # actions: write lets the last step re-enable this workflow; see the note there.
+  actions: write
+  contents: read
+
+jobs:
+  visit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - run: pip install playwright==1.63.0 && python -m playwright install --with-deps chromium
+      - run: python .github/keep_awake.py "$APP_URL" "AI Support Ticket Triage"
+        env:
+          APP_URL: https://project2-ai-ticket-triage-ubf6qjhxmukei7tzjp5xgo.streamlit.app
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: failure-screenshot
+          path: keep_awake_failure.png
+          if-no-files-found: ignore
+      # GitHub disables scheduled workflows in a repository with no commits for 60 days.
+      # Re-enabling through the API resets that timer without adding commits.
+      - run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/keep-awake.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
