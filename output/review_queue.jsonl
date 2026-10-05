@@ -1,0 +1,10 @@
+{"ticket_id": "TKT-0041", "subject": "it doesnt work", "reason": "confidence 0.30 < 0.75", "model_guess": "technical_bug", "confidence": 0.3}
+{"ticket_id": "TKT-0043", "subject": "Charts render blank in Firefox", "reason": "confidence 0.70 < 0.75", "model_guess": "technical_bug", "confidence": 0.7}
+{"ticket_id": "TKT-0061", "subject": "URGENT!!!", "reason": "confidence 0.40 < 0.75", "model_guess": "account_access", "confidence": 0.4}
+{"ticket_id": "TKT-0084", "subject": "can't change my email address", "reason": "confidence 0.70 < 0.75", "model_guess": "technical_bug", "confidence": 0.7}
+{"ticket_id": "TKT-0102", "subject": "Cancel", "reason": "confidence 0.60 < 0.75", "model_guess": "billing", "confidence": 0.6}
+{"ticket_id": "TKT-0113", "subject": "Slow", "reason": "confidence 0.60 < 0.75", "model_guess": "technical_bug", "confidence": 0.6}
+{"ticket_id": "TKT-0120", "subject": "Question", "reason": "confidence 0.20 < 0.75", "model_guess": "technical_bug", "confidence": 0.2}
+{"ticket_id": "TKT-0157", "subject": "billing page down - error 403", "reason": "confidence 0.65 < 0.75", "model_guess": "technical_bug", "confidence": 0.65}
+{"ticket_id": "TKT-0161", "subject": "Charts render blank in Firefox", "reason": "confidence 0.70 < 0.75", "model_guess": "technical_bug", "confidence": 0.7}
+{"ticket_id": "TKT-0166", "subject": "Suggestion + problem", "reason": "confidence 0.70 < 0.75", "model_guess": "technical_bug", "confidence": 0.7}
