@@ -41,4 +41,4 @@ header[data-testid="stHeader"] {{ background: transparent; }}
 [data-testid="stCode"], [data-testid="stDataFrame"] {{ border: 2px solid {INK}; border-radius: 12px; overflow: hidden; }}
 .stApp a {{ color: {INK}; font-weight: 600; }}
 </style>""")
-    st.markdown(f"""<div class="pf-bar"><a class="pf-home" href="{PORTFOLIO}#{anchor}" target="_self"><span class="pf-dot">LL</span>Lekan Lawal</a><a class="pf-pill" href="{PORTFOLIO}{case_study}" target="_self">Case study</a></div><div class="pf-band"></div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="pf-bar"><a class="pf-home" href="{PORTFOLIO}#{anchor}" target="_self"><span class="pf-dot">LL</span>&larr; Back to all projects</a><a class="pf-pill" href="{PORTFOLIO}{case_study}" target="_self">Case study</a></div><div class="pf-band"></div>""", unsafe_allow_html=True)
