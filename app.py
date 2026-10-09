@@ -15,10 +15,12 @@ import streamlit as st
 
 sys.path.append(str(Path(__file__).parent / "src"))
 from triage import CONFIDENCE_THRESHOLD, TriageEngine  # noqa: E402
+import portfolio_theme  # noqa: E402
 
 st.set_page_config(page_title="AI Ticket Triage", page_icon="🎫", layout="centered")
+portfolio_theme.apply(accent="#3E8BFF", anchor="triage", case_study="projects/project2.html")
 
-st.title("🎫 AI Support Ticket Triage")
+st.title("AI Support Ticket Triage")
 st.caption(
     "Gemini 3 Flash classifies the ticket (category · priority · routing) with a "
     f"confidence score. Below **{CONFIDENCE_THRESHOLD:.0%}** confidence, the ticket is "
