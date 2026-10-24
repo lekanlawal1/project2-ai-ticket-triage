@@ -2,7 +2,7 @@
 
 Why Streamlit (vs Flask/React): the pipeline is Python, Streamlit keeps the demo
 in one language and one file, and Streamlit Community Cloud deploys free straight
-from the GitHub repo with a built-in secrets manager for the API key — no
+from the GitHub repo with a built-in secrets manager for the API key - no
 servers, no card on file. A React front end would show more front-end skill but
 this project's point is AI-pipeline engineering, not UI engineering.
 """
@@ -24,11 +24,11 @@ st.title("AI Support Ticket Triage")
 st.caption(
     "Gemini 3 Flash classifies the ticket (category · priority · routing) with a "
     f"confidence score. Below **{CONFIDENCE_THRESHOLD:.0%}** confidence, the ticket is "
-    "sent to a human instead of auto-routed — the system is designed to know when not "
+    "sent to a human instead of auto-routed - the system is designed to know when not "
     "to trust itself. [Source & docs](https://github.com/lekanlawal1/project2-ai-ticket-triage)")
 
 EXAMPLES = {
-    "— pick an example or write your own —": ("", ""),
+    "Pick an example, or write your own": ("", ""),
     "Clear-cut: double charge": (
         "Charged twice this month",
         "I was charged $49.99 twice on the same day for my Pro subscription. "
@@ -77,7 +77,7 @@ if st.button("Triage this ticket", type="primary", disabled=not body.strip()):
 
     if result["status"] == "fallback":
         st.warning(f"The API call failed after {result['attempts']} attempts "
-                   f"(`{result['failure_reason']}`) — in production this ticket would "
+                   f"(`{result['failure_reason']}`) - in production this ticket would "
                    "drop into the human review queue, not get lost. That fallback is "
                    "working as designed, even in this demo.")
         st.stop()
@@ -94,17 +94,17 @@ if st.button("Triage this ticket", type="primary", disabled=not body.strip()):
         st.success(f"**Auto-routed → {result['route'].replace('_', ' ')} queue.** "
                    f"{result['routing_recommendation']}")
     else:
-        st.warning(f"**Sent to human review** — {result['failure_reason']}. "
+        st.warning(f"**Sent to human review** - {result['failure_reason']}. "
                    "The model's guess is shown above, but it isn't trusted to act alone "
                    "on this one. Suggested owner if confirmed: "
                    f"{result['routing_recommendation']}")
 
 with st.expander("How the error handling works"):
     st.markdown(f"""
-- **Structured output**: Gemini is forced into a JSON schema (`response_schema`) — no free-text parsing.
+- **Structured output**: Gemini is forced into a JSON schema (`response_schema`) - no free-text parsing.
 - **Confidence gate**: below {CONFIDENCE_THRESHOLD:.0%}, the ticket routes to `human_review` instead of a team queue.
 - **Retries**: rate limits (429), 5xx errors, timeouts and malformed JSON each get up to 4 attempts with exponential backoff.
-- **Fallback**: if all retries fail, the ticket lands in the review queue with the failure reason logged — the pipeline never crashes and never silently drops a ticket.
+- **Fallback**: if all retries fail, the ticket lands in the review queue with the failure reason logged - the pipeline never crashes and never silently drops a ticket.
 
-Evaluated on 171 labeled synthetic tickets: **90.1% category accuracy on auto-routed tickets**, 5.8% sent to human review — see `output/eval_report.md` in the repo for calibration and misclassification analysis.
+Evaluated on 171 labeled synthetic tickets: **90.1% category accuracy on auto-routed tickets**, 5.8% sent to human review - see `output/eval_report.md` in the repo for calibration and misclassification analysis.
 """)

@@ -5,12 +5,12 @@ Free-tier realities shape this script:
   are throttled (THROTTLE_S between requests) and the run is RESUMABLE: results
   append to output/triage_results.csv and already-done ticket_ids are skipped,
   so a rate-limit abort or daily-cap cutoff costs nothing but time.
-- Ground-truth columns are excluded from what the model sees — it gets only
+- Ground-truth columns are excluded from what the model sees - it gets only
   subject and body, exactly what a production system would have.
 
 Outputs:
-  output/triage_results.csv  — one row per ticket with the triage decision
-  output/review_queue.jsonl  — every ticket routed to human_review, with reason
+  output/triage_results.csv - one row per ticket with the triage decision
+  output/review_queue.jsonl - every ticket routed to human_review, with reason
 """
 
 import csv

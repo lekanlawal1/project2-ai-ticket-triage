@@ -6,8 +6,8 @@ Scored 171 tickets (0 API fallbacks).
 
 | Metric | Value |
 |---|---|
-| Category accuracy — auto-routed tickets (no human sees these) | **90.1%** (145/161) |
-| Category accuracy — all classified tickets | 89.5% (153/171) |
+| Category accuracy - auto-routed tickets (no human sees these) | **90.1%** (145/161) |
+| Category accuracy - all classified tickets | 89.5% (153/171) |
 | Sent to human review | 10/171 (5.8%) |
 | Priority exact match | 64.3% |
 | Priority within one level | 99.4% |
@@ -45,12 +45,12 @@ Scored 171 tickets (0 API fallbacks).
 | TKT-0062 | Extremely disappointed with support response tim | complaint | billing | 0.95 | ⚠️ yes |
 | TKT-0066 | Can't change my email address | account_access | technical_bug | 0.90 | ⚠️ yes |
 | TKT-0079 | Unhappy with recent price increase | complaint | billing | 0.80 | ⚠️ yes |
-| TKT-0084 | can't change my email address | account_access | technical_bug | 0.70 | no — caught |
+| TKT-0084 | can't change my email address | account_access | technical_bug | 0.70 | no - caught |
 | TKT-0090 | Sales promised features that don't exist | complaint | billing | 0.95 | ⚠️ yes |
 | TKT-0097 | Login problem after invoice | account_access | billing | 0.90 | ⚠️ yes |
 | TKT-0106 | CAN'T CHANGE MY EMAIL ADDRESS | account_access | technical_bug | 0.95 | ⚠️ yes |
 | TKT-0117 | sales promised features that don't exist | complaint | billing | 0.95 | ⚠️ yes |
-| TKT-0120 | Question | complaint | technical_bug | 0.20 | no — caught |
+| TKT-0120 | Question | complaint | technical_bug | 0.20 | no - caught |
 | TKT-0123 | Sales promised features that don't exist | complaint | billing | 0.90 | ⚠️ yes |
 | TKT-0124 | Your app deleted my data | technical_bug | account_access | 0.90 | ⚠️ yes |
 | TKT-0139 | Extremely disappointed with support response tim | complaint | billing | 0.95 | ⚠️ yes |

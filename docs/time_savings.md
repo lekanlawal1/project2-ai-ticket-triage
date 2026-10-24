@@ -1,6 +1,6 @@
 # Before / After: Time-Savings Estimate
 
-Showing the math, not just the headline — every input is either cited or
+Showing the math, not just the headline - every input is either cited or
 labeled as an assumption you can swap out.
 
 ## Baseline: what manual triage costs
@@ -15,7 +15,7 @@ before anyone starts solving):
   (engineer triage) to **33 minutes** (support-analyst triage) for complex
   alerts/tickets ([arXiv:2602.02585](https://arxiv.org/pdf/2602.02585)).
 
-**Chosen baseline: 4 minutes/ticket** — the low end of the vendor range,
+**Chosen baseline: 4 minutes/ticket** - the low end of the vendor range,
 deliberately conservative (a defensible floor, not an impressive-looking
 average). Sensitivity to this choice is shown below. *Caveat I'd volunteer in
 an interview: the 3–8 min figures come from automation vendors with an
@@ -37,9 +37,9 @@ A support desk at ~50 tickets/business day. All figures monthly.
 
 | Component | Math | Hours |
 |---|---|---|
-| Auto-routed tickets — human time | ~0 min each | 0 |
-| Human review queue (**r = 5.8% measured** in the evaluated run — `output/eval_report.md`) | 1,000 × 5.8% × 4 min | 3.9 |
-| QA spot-check of auto-routed (5% sample, 1 min each — you audit an automated system, you don't trust it blind) | 942 × 5% × 1 min | 0.8 |
+| Auto-routed tickets - human time | ~0 min each | 0 |
+| Human review queue (**r = 5.8% measured** in the evaluated run - `output/eval_report.md`) | 1,000 × 5.8% × 4 min | 3.9 |
+| QA spot-check of auto-routed (5% sample, 1 min each - you audit an automated system, you don't trust it blind) | 942 × 5% × 1 min | 0.8 |
 | **Total** | | **≈ 4.7** |
 
 **Saved: ≈ 62 hours/month (93% reduction)** at the measured review rate.
@@ -49,13 +49,13 @@ support, assumption): **≈ CA$1,860/month ≈ CA$22K/year**, or roughly a third
 of a full-time role redirected from sorting tickets to solving them.
 
 *Why the sensitivity table below still uses higher review rates (10–25%): the
-5.8% was measured on synthetic data where the model runs hot on confidence —
+5.8% was measured on synthetic data where the model runs hot on confidence -
 production tickets are messier, and the error-handling doc argues the
 threshold should probably be tightened, which raises r. Treat 5.8% as the
 optimistic bound and the table as the defensible range.*
 
 Pipeline compute cost: $0 on the free tier at this volume's rate; at paid-tier
-Gemini Flash pricing this workload is on the order of a few dollars/month —
+Gemini Flash pricing this workload is on the order of a few dollars/month -
 negligible against the labor line.
 
 ## Sensitivity table (defend any cell)
@@ -75,8 +75,8 @@ on the minority that aren't.
 
 ## What this deliberately does NOT claim
 
-- No resolution-time savings — this automates *triage only*; solving the
+- No resolution-time savings - this automates *triage only*; solving the
   ticket still takes as long as it takes.
-- No headcount reduction claim — the honest framing is capacity reallocation.
+- No headcount reduction claim - the honest framing is capacity reallocation.
 - The review rate r is measured on synthetic data; the first month of
   production data would recalibrate it (and the confidence threshold with it).

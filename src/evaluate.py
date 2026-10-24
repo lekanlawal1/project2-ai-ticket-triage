@@ -1,7 +1,7 @@
 """Score the pipeline against ground truth and write output/eval_report.md.
 
 What gets measured, and why it's framed this way:
-- Category accuracy on AUTO-ROUTED tickets is the number that matters — those are
+- Category accuracy on AUTO-ROUTED tickets is the number that matters - those are
   the ones no human checks. Overall accuracy alone would hide whether the
   confidence gate is doing its job.
 - Ambiguous tickets are reported separately: they were planted to be hard, and
@@ -42,8 +42,8 @@ def main():
     lines += [
         "## Headline numbers", "",
         "| Metric | Value |", "|---|---|",
-        f"| Category accuracy — auto-routed tickets (no human sees these) | **{auto['cat_correct'].mean():.1%}** ({auto['cat_correct'].sum()}/{len(auto)}) |",
-        f"| Category accuracy — all classified tickets | {ok['cat_correct'].mean():.1%} ({ok['cat_correct'].sum()}/{len(ok)}) |",
+        f"| Category accuracy - auto-routed tickets (no human sees these) | **{auto['cat_correct'].mean():.1%}** ({auto['cat_correct'].sum()}/{len(auto)}) |",
+        f"| Category accuracy - all classified tickets | {ok['cat_correct'].mean():.1%} ({ok['cat_correct'].sum()}/{len(ok)}) |",
         f"| Sent to human review | {len(review)}/{len(df)} ({len(review)/len(df):.1%}) |",
         f"| Priority exact match | {ok['pri_correct'].mean():.1%} |",
         f"| Priority within one level | {ok['pri_within_one'].mean():.1%} |",
@@ -56,7 +56,7 @@ def main():
     buckets = [(0.0, 0.5), (0.5, 0.75), (0.75, 0.9), (0.9, 1.01)]
     for lo, hi in buckets:
         b = ok[(ok["confidence"] >= lo) & (ok["confidence"] < hi)]
-        acc = f"{b['cat_correct'].mean():.1%}" if len(b) else "—"
+        acc = f"{b['cat_correct'].mean():.1%}" if len(b) else "-"
         lines.append(f"| {lo:.2f}–{min(hi, 1.0):.2f} | {len(b)} | {acc} |")
     lines.append("")
 
@@ -72,7 +72,7 @@ def main():
     for _, r in wrong.iterrows():
         subj = str(r["subject"])[:48]
         lines.append(f"| {r['ticket_id']} | {subj} | {r['true_category']} | "
-                     f"{r['category']} | {r['confidence']:.2f} | {'⚠️ yes' if r['auto_routed'] else 'no — caught'} |")
+                     f"{r['category']} | {r['confidence']:.2f} | {'⚠️ yes' if r['auto_routed'] else 'no - caught'} |")
     lines.append("")
 
     out = ROOT / "output" / "eval_report.md"

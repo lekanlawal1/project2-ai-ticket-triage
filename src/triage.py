@@ -1,8 +1,8 @@
 """Core triage engine: classify one support ticket with Gemini 3 Flash.
 
 (Originally scoped for Gemini 2.5 Flash; that model has been retired for new
-API keys. gemini-3.5-flash's free quota is just 20 requests/day — unworkable
-for a batch this size — and gemini-2.0-flash / gemini-2.0-flash-lite returned
+API keys. gemini-3.5-flash's free quota is just 20 requests/day - unworkable
+for a batch this size - and gemini-2.0-flash / gemini-2.0-flash-lite returned
 a hard 0-quota for this key's project. gemini-3-flash-preview is Google's
 current recommended free-tier model: 1,500 requests/day, 10/min.)
 
@@ -54,7 +54,7 @@ class Priority(str, enum.Enum):
 
 
 class TriageResult(BaseModel):
-    """Schema enforced on the model via response_schema — Gemini must return exactly this."""
+    """Schema enforced on the model via response_schema - Gemini must return exactly this."""
     category: Category
     priority: Priority
     confidence: float = Field(ge=0.0, le=1.0,
@@ -63,7 +63,7 @@ class TriageResult(BaseModel):
         description="One sentence: which team/queue should handle this and why")
 
 
-# v1 — naive prompt, kept for the docs. What broke: invented categories
+# v1 - naive prompt, kept for the docs. What broke: invented categories
 # ("payment_issue"), no confidence signal, priority inflation, spam classified
 # as complaints. Details + examples in docs/prompt_engineering.md.
 SYSTEM_PROMPT_V1 = (
@@ -71,11 +71,11 @@ SYSTEM_PROMPT_V1 = (
     "priority, and suggest where to route it."
 )
 
-# v2 — final prompt: closed category set with definitions, priority rubric anchored
+# v2 - final prompt: closed category set with definitions, priority rubric anchored
 # to business impact, tie-breaking rules for mixed tickets, honest-confidence
 # instruction, and explicit spam criteria.
 SYSTEM_PROMPT_V2 = """You are the first-line triage system for a B2B SaaS support desk. \
-For each ticket, classify it for routing. Your output is machine-processed — a human only \
+For each ticket, classify it for routing. Your output is machine-processed - a human only \
 sees tickets you are unsure about, so an honest low confidence is more valuable than a \
 confident guess.
 
@@ -88,7 +88,7 @@ CATEGORIES (choose exactly one):
 - spam: unsolicited sales pitches, scams, phishing, or messages unrelated to being a customer
 
 TIE-BREAKING for mixed tickets:
-1. If any part alleges wrong charges or money owed, prefer billing — money errors have deadlines and compliance implications.
+1. If any part alleges wrong charges or money owed, prefer billing - money errors have deadlines and compliance implications.
 2. A frustrated tone with a concrete fixable issue is that issue's category, not complaint. Use complaint only when venting/escalating IS the point.
 3. Suspected account compromise always wins over other signals.
 
@@ -101,7 +101,7 @@ Capitalized words or exclamation marks alone do NOT raise priority.
 
 CONFIDENCE: report your genuine certainty in the category assignment.
 Use below 0.75 whenever the ticket is vague, contradictory, spans multiple plausible \
-categories, or is too short to be sure — such tickets go to a human, which is the \
+categories, or is too short to be sure - such tickets go to a human, which is the \
 correct outcome. Never inflate confidence.
 
 ROUTING_RECOMMENDATION: one sentence naming the team (Billing Ops, Engineering \
@@ -120,7 +120,7 @@ class TriageEngine:
         self.threshold = threshold
 
     def classify(self, subject: str, body: str) -> dict:
-        """Classify one ticket. Always returns a dict — never raises on API trouble.
+        """Classify one ticket. Always returns a dict - never raises on API trouble.
 
         Returns keys: category, priority, confidence, routing_recommendation,
         auto_routed (bool), route (final queue), status ('ok'|'fallback'),
@@ -141,7 +141,7 @@ class TriageEngine:
                     },
                 )
                 # .parsed is None when the model returns malformed/truncated JSON
-                # despite schema mode — rare but real. Pydantic also rejects
+                # despite schema mode - rare but real. Pydantic also rejects
                 # out-of-range confidence here. Treat both as retryable.
                 result: TriageResult | None = response.parsed
                 if result is None:
@@ -160,7 +160,7 @@ class TriageEngine:
         # Fallback: never crash the batch; the ticket goes to a human with the reason.
         return {
             "category": None, "priority": None, "confidence": 0.0,
-            "routing_recommendation": "Automatic triage failed — needs manual review",
+            "routing_recommendation": "Automatic triage failed - needs manual review",
             "auto_routed": False, "route": "human_review",
             "status": "fallback", "failure_reason": last_error,
             "attempts": MAX_RETRIES,
@@ -188,5 +188,5 @@ class TriageEngine:
         # so the wait is worth it; jitter avoids thundering-herd on retry.
         delay = BASE_BACKOFF_S * (2 ** (attempt - 1)) + random.uniform(0, 2)
         label = f"HTTP {api_error.code}" if api_error else "transient error"
-        print(f"    {label} — retrying in {delay:.0f}s (attempt {attempt}/{MAX_RETRIES})")
+        print(f"    {label} - retrying in {delay:.0f}s (attempt {attempt}/{MAX_RETRIES})")
         time.sleep(delay)

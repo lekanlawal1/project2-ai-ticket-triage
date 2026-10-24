@@ -12,7 +12,7 @@ Design decisions (mirrors the decision-log style of Project 1):
 
 Output: data/tickets.csv with columns
   ticket_id, subject, body, true_category, true_priority, is_ambiguous
-Ground-truth columns are used ONLY by the evaluator — the pipeline never sees them.
+Ground-truth columns are used ONLY by the evaluator - the pipeline never sees them.
 """
 
 import csv
@@ -127,7 +127,7 @@ TEMPLATES = {
     ],
 }
 
-# Deliberately ambiguous tickets — the edge cases the pipeline must handle honestly.
+# Deliberately ambiguous tickets - the edge cases the pipeline must handle honestly.
 # Labels reflect the *most defensible* reading; is_ambiguous=1 lets the evaluator
 # report these separately.
 AMBIGUOUS = [
