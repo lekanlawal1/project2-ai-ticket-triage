@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Page and scoring code
+        run: node --test tests/*.test.mjs
+      - name: Worker
+        run: node --test worker/test/*.test.mjs
+      - name: The saved results match the saved answers
+        run: |
+          node pipeline/evaluate.mjs > /dev/null
+          git diff --exit-code site/data/ || (echo "::error::site/data is out of date: run node pipeline/evaluate.mjs"; exit 1)

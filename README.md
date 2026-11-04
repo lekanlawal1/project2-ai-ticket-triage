@@ -1,53 +1,52 @@
-# AI Support Ticket Triage - LLM Pipeline with Guardrails
+# Inbox Departures: AI ticket triage for bank support
 
-**Live demo:** https://project2-ai-ticket-triage-ubf6qjhxmukei7tzjp5xgo.streamlit.app · **Stack:** Python · Gemini 3 Flash (structured output) · Streamlit · pandas
+**Live demo:** https://lekanlawal1.github.io/project2-ai-ticket-triage/ · **Stack:** Gemini (structured output) · scikit-learn · JavaScript · Cloudflare Workers · GitHub Actions
 
-## Problem statement
+Type a message a bank customer might send and watch it get routed to one of seven support teams, or held for a person. Or let the board replay hundreds of real test messages and keep score.
 
-Support desks burn 3–8 minutes of human attention per ticket just deciding *what it is and who should handle it* - before anyone starts solving anything. An LLM can do that first pass in seconds, but an LLM is an unreliable component: it hallucinates labels, inflates priorities for shouty customers, and returns confident nonsense on vague input. This project automates the triage step **and engineers around the unreliability** - the interesting part isn't the API call, it's everything wrapped around it.
+## The problem
 
-## My approach
+A support desk spends minutes per message just deciding who should handle it. An AI can do that first pass in a second, but it's an unreliable part: it can be confidently wrong, and its own "how sure am I" doesn't catch that. The previous version of this project proved the point: it filed complaints that mentioned money as billing at 95% confidence, and the confidence check never noticed.
 
-1. **Dataset** (`src/generate_tickets.py`): 171 synthetic tickets across 6 categories with ground-truth labels, generated with slot-filling + noise injection (typos, ALL-CAPS, vague one-liners). 15 are *deliberately ambiguous* - planted edge cases the system must handle honestly rather than guess at.
-2. **Pipeline** (`src/triage.py`, `src/run_pipeline.py`): Gemini 3 Flash classifies category, priority, and routing via **enforced JSON schema** (`response_schema` + Pydantic - no free-text parsing), with a self-reported confidence score.
-3. **Guardrails**: confidence below **0.75 → human review queue**, never auto-routed. Retries with exponential backoff for 429s/5xx/timeouts/malformed JSON; a fallback result if all retries fail - the batch never crashes and never silently drops a ticket. Resumable runs (free-tier daily caps are a design constraint, not a surprise).
-4. **Evaluation** (`src/evaluate.py`): accuracy scored *separately* for auto-routed vs. human-reviewed and clear vs. ambiguous tickets, plus a confidence-calibration table that empirically justifies the threshold.
+## How it works
 
-## Key decisions and why
+1. **The AI reads the message.** Gemini returns a team, a priority, how sure it is, and the words that decided it, in a fixed JSON shape it can't step outside. Code checks that the quoted words are really in the message.
+2. **A plain model reads it too.** TF-IDF and logistic regression, trained on Banking77's 10,003 training messages. It runs in the visitor's browser and never sees the AI's answer.
+3. **Code decides.** A message goes straight to a team only when both pick the same team, the AI is at least 80% sure, and its quote checks out. Everything else goes to a person, with the reasons. The 80% bar was set before scoring and isn't tuned on the results.
 
-- **Gemini 3 Flash free tier** - the zero-cost constraint forced first-class rate-limit engineering (throttling, backoff, resumability), which is exactly the skill the project demonstrates. A paid tier would have let me skip the most instructive part.
-- **Schema-enforced output over prompt-and-parse** - v1 of the prompt invented category labels that don't exist as queues. The schema forces valid enums; the improved prompt makes the choice informed. Both iterations documented in [docs/prompt_engineering.md](docs/prompt_engineering.md).
-- **Confidence gate over maximizing accuracy** - the design goal is not zero errors; it's that errors get *caught*. A misclassification with low confidence costs 4 minutes of human review (same as the pre-automation baseline). Only high-confidence errors are true failures, and they're measured in [output/eval_report.md](output/eval_report.md).
-- **Self-reported confidence, empirically checked** - LLM confidence is not a calibrated probability, so the eval includes a calibration table (accuracy per confidence bucket). The table justifies the threshold; the model's say-so doesn't.
-- **Streamlit over Flask/React** - one language across pipeline and demo, free GitHub-integrated hosting with a secrets manager. The project's point is AI-pipeline engineering, not front-end engineering.
-- **Synthetic data over scraped** - no PII/licensing risk, and planted edge cases with clean ground truth make honest evaluation possible.
+## The data
 
-## Results (live evaluated run, all 171 tickets, 0 API failures)
+[Banking77](https://github.com/PolyAI-LDN/task-specific-datasets) (PolyAI, CC BY 4.0): 13,083 customer messages to a bank, each labelled by people with one of 77 request types. I grouped the 77 types into seven teams a bank's support desk would have (Cards, Transfers, Top-ups, Cash and ATMs, Fees and exchange, Account and identity, Fraud and security) and set priorities by request type, before running any model. The grouping is in [pipeline/teams.py](pipeline/teams.py).
 
-- **90.1% category accuracy on auto-routed tickets** (145/161 - the ones no human checks); **5.8% routed to human review**; priority within one level **99.4%** of the time. Full breakdown: [output/eval_report.md](output/eval_report.md)
-- **Evaluation caught a systematic prompt bug**: complaints that mention money ("sales promised features that don't exist") get filed as `billing` at 95% confidence - traceable to a tie-breaking rule I wrote, and invisible to the confidence gate. The gate catches *vagueness*, not *bias*; the write-up of what that means for production is in [docs/error_handling.md](docs/error_handling.md)
-- Estimated impact at 1,000 tickets/month with the measured 5.8% review rate: **≈62 hours (~CA$1,860) of triage labor saved monthly** - math, citations, and sensitivity analysis in [docs/time_savings.md](docs/time_savings.md)
+Unlike the first version of this project, nothing here is written by me: the messages and their labels are someone else's, so the scores can be checked.
 
-## Repo structure
+## Scoring
 
-```
-data/tickets.csv           171 labeled synthetic tickets (ground truth for eval only)
-src/generate_tickets.py    reproducible dataset generator (seeded)
-src/triage.py              triage engine: schema, prompts v1+v2, retries, confidence gate
-src/run_pipeline.py        throttled, resumable batch runner
-src/evaluate.py            scores results vs ground truth → output/eval_report.md
-app.py                     Streamlit demo (paste a ticket, watch the decision)
-output/                    triage_results.csv · review_queue.jsonl · eval_report.md
-docs/                      prompt_engineering.md · error_handling.md · time_savings.md · case_study.md
-```
+The AI is scored on 770 test messages, 10 from each of the 77 request types, through the same code the live demo uses ([worker/src/triage.js](worker/src/triage.js)). The results, and every message with both opinions and the right answer, are in [site/data/](site/data/). The plain model gets 96.2% of all 3,080 test messages into the right team; it has seen 10,000 messages just like them, so the interesting questions are how often the AI and the plain model agree, how often they're both wrong together, and whether the AI's confidence means anything. The page answers all three.
 
 ## Run it
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-cp .env.example .env                      # paste your free key from aistudio.google.com/apikey
-.venv/bin/python src/generate_tickets.py  # regenerate the dataset (deterministic)
-.venv/bin/python src/run_pipeline.py      # batch triage (throttled; resumable if interrupted)
-.venv/bin/python src/evaluate.py          # score it → output/eval_report.md
-.venv/bin/streamlit run app.py            # local demo
+pip install -r pipeline/requirements.txt
+python pipeline/baseline.py                          # train the plain model, export site/data/baseline.json
+python pipeline/sample.py                            # the fixed 770-message scoring sample
+GEMINI_API_KEY=... node pipeline/run_gemini.mjs      # ask Gemini (resumable; free tier is fine)
+node pipeline/evaluate.mjs                           # score, write site/data/results.json and inbox.json
+node --test tests/*.test.mjs worker/test/*.test.mjs  # tests
+cd site && python -m http.server 8800                # the page, at http://localhost:8800
 ```
+
+## Layout
+
+```
+pipeline/teams.py        the seven teams and which request types each handles
+pipeline/baseline.py     trains and exports the plain model
+pipeline/sample.py       the 770-message scoring sample
+pipeline/run_gemini.mjs  the scoring run (same code as the live demo)
+pipeline/evaluate.mjs    scores everything with the page's own code
+worker/                  the Cloudflare Worker that holds the Gemini key
+site/                    the page: baseline.js (plain model), rule.js (the decision), app.js
+tests/                   the browser model matches Python on all 3,080 test messages; the decision rule
+```
+
+The first version (synthetic tickets, Streamlit) is in the git history.

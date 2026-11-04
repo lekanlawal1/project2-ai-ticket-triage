@@ -1,0 +1,40 @@
+name: Score the AI
+# Sends the 770 sample messages to Gemini through the same code as the live demo, then rescores
+# and commits the results. It picks up where it left off, so if the free tier's daily limit stops
+# it, the daily run finishes the rest. Once every message is scored, the daily run does nothing.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 6 * * *"
+permissions:
+  contents: write
+  actions: write      # to start the site deploy after committing new results
+concurrency:
+  group: score
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Ask Gemini about the messages not yet scored
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then echo "::notice::GEMINI_API_KEY isn't set yet"; exit 0; fi
+          node pipeline/run_gemini.mjs
+      - name: Rescore
+        run: node pipeline/evaluate.mjs
+      - name: Commit the answers and results
+        run: |
+          git add data/gemini_results.jsonl site/data/ 2>/dev/null || true
+          if git diff --cached --quiet; then echo "Nothing new"; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Scoring run: $(wc -l < data/gemini_results.jsonl) of 770 messages answered"
+          git push
+          # a push made by a workflow doesn't start other workflows, so start the site deploy directly
+          gh workflow run deploy-site.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

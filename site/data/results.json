@@ -1,0 +1,92 @@
+{
+ "model": "gemini-3-flash-preview",
+ "prompt": "v3",
+ "threshold": 0.8,
+ "sample": 770,
+ "scored": 0,
+ "baseline": {
+  "correct": 96.1,
+  "testAccuracyAll": 0.9617
+ },
+ "ai": null,
+ "agree": null,
+ "decision": null,
+ "confidenceOnly": null,
+ "calibration": [
+  {
+   "from": 0,
+   "to": 0.5,
+   "n": 0,
+   "correct": null
+  },
+  {
+   "from": 0.5,
+   "to": 0.8,
+   "n": 0,
+   "correct": null
+  },
+  {
+   "from": 0.8,
+   "to": 0.9,
+   "n": 0,
+   "correct": null
+  },
+  {
+   "from": 0.9,
+   "to": 0.95,
+   "n": 0,
+   "correct": null
+  },
+  {
+   "from": 0.95,
+   "to": 1,
+   "n": 0,
+   "correct": null
+  }
+ ],
+ "perTeam": [
+  {
+   "team": "cards",
+   "n": 260,
+   "ai": null,
+   "baseline": 98.8
+  },
+  {
+   "team": "account",
+   "n": 90,
+   "ai": null,
+   "baseline": 98.9
+  },
+  {
+   "team": "cash",
+   "n": 50,
+   "ai": null,
+   "baseline": 94
+  },
+  {
+   "team": "top_ups",
+   "n": 90,
+   "ai": null,
+   "baseline": 95.6
+  },
+  {
+   "team": "transfers",
+   "n": 100,
+   "ai": null,
+   "baseline": 91
+  },
+  {
+   "team": "fees_fx",
+   "n": 120,
+   "ai": null,
+   "baseline": 94.2
+  },
+  {
+   "team": "fraud",
+   "n": 60,
+   "ai": null,
+   "baseline": 95
+  }
+ ],
+ "confusions": []
+}
