@@ -1,8 +1,8 @@
-# Inbox Departures: AI ticket triage for bank support
+# Sorted: AI ticket triage for bank support
 
 **Live demo:** https://lekanlawal1.github.io/project2-ai-ticket-triage/ · **Stack:** Gemini (structured output) · scikit-learn · JavaScript · Cloudflare Workers · GitHub Actions
 
-Type a message a bank customer might send and watch it get routed to one of seven support teams, or held for a person. Or let the board replay hundreds of real test messages and keep score.
+Type a message a bank customer might send and watch it get sorted to one of seven support teams, or held for a person. Or browse 770 real test messages by queue, with the right answer for each, and filter to just the mistakes.
 
 ## The problem
 

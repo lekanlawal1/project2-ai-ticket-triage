@@ -1,5 +1,5 @@
-// Inbox Departures: the page. The AI's answer comes from the Worker; the plain model runs here
-// (baseline.js) and the decision is made here (rule.js), the same code the scoring run used.
+// Sorted: the page. The AI's answer comes from the Worker; the plain model runs here (baseline.js)
+// and the decision is made here (rule.js), the same code the scoring run used.
 import { load, predict } from "./baseline.js";
 import { decide } from "./rule.js";
 
@@ -7,38 +7,14 @@ const API = window.TRIAGE_API;
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wide = matchMedia("(min-width: 1000px)");
 
+const TEAMS = ["fraud", "cards", "transfers", "top_ups", "cash", "fees_fx", "account"];
 const NAME = { cards: "Cards", transfers: "Transfers", top_ups: "Top-ups", cash: "Cash and ATMs", fees_fx: "Fees and exchange",
-  account: "Account and identity", fraud: "Fraud and security", human: "Human desk" };
-const GATE = { cards: "CARDS", transfers: "TRANSFERS", top_ups: "TOP-UPS", cash: "CASH/ATM", fees_fx: "FEES/FX", account: "ACCOUNT",
-  fraud: "FRAUD", human: "HUMAN DESK" };
+  account: "Account and identity", fraud: "Fraud and security", human: "A person checks" };
+const colour = (t) => `var(--${t || "human"})`;
+const pct = (p) => `${Math.round(p * 100)}%`;
 const intentName = (s) => s.replace(/\?$/, "").replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
-
-// ---------------------------------------------------------------- split-flap letters
-const CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-%.";
-export function flap(el, text, { cls = "", pad = 0 } = {}) {
-  const target = String(text).toUpperCase().padEnd(pad, " ");
-  el.className = `flaps ${cls}`.trim();
-  el.setAttribute("aria-label", String(text));
-  el.innerHTML = [...target].map((c) => `<span class="f${c === " " ? " sp" : ""}" aria-hidden="true">${esc(c === " " ? " " : c)}</span>`).join("");
-  if (still) return;
-  const cells = [...el.children];
-  cells.forEach((cell, i) => {
-    const want = target[i];
-    if (want === " ") return;
-    let n = 4 + i * 2 + Math.floor(Math.random() * 3);
-    const t = setInterval(() => {
-      if (--n <= 0) { cell.textContent = want; clearInterval(t); return; }
-      cell.textContent = CHARS[1 + Math.floor(Math.random() * (CHARS.length - 1))];
-    }, 45);
-  });
-}
-
-// ---------------------------------------------------------------- clock
-const pad2 = (n) => String(n).padStart(2, "0");
-const hhmm = (d) => `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-const tick = () => { $("#clock").textContent = hhmm(new Date()); };
-tick(); setInterval(tick, 15000);
 
 // ---------------------------------------------------------------- data
 const get = (p) => fetch(p).then((r) => { if (!r.ok) throw new Error(p); return r.json(); });
@@ -47,57 +23,116 @@ const modelReady = get("data/baseline.json").then((m) => (model = load(m)));
 const resultsReady = get("data/results.json");
 const inboxReady = get("data/inbox.json");
 
-// ---------------------------------------------------------------- hero numbers
-function stat(value, label, cls = "") {
-  const d = document.createElement("div");
-  d.className = "stat";
-  d.innerHTML = `<span></span><p>${esc(label)}</p>`;
-  flap(d.firstChild, value, { cls });
-  return d;
+// ---------------------------------------------------------------- state
+let saved = [];                 // the scored test messages
+const mine = [];                // messages sorted on this visit, newest first
+const S = { queue: "all", show: "all", limit: 30, selected: null };
+const all = () => [...mine, ...saved];
+const inQueue = (r) => S.queue === "all" || r.route === S.queue;
+const isWrong = (r) => !r.mine && r.route !== "human" && r.route !== r.team;
+const visible = () => all().filter((r) => inQueue(r) && (S.show === "all" || isWrong(r)));
+
+// ---------------------------------------------------------------- queues
+function drawQueues() {
+  const n = (q) => all().filter((r) => q === "all" || r.route === q).length;
+  const btn = (q, label, c) => `<button type="button" class="q${q === "all" ? " all" : ""}" data-q="${q}" aria-pressed="${S.queue === q}" style="--c:${c}">
+    <span class="nm">${q === "all" ? "" : `<span class="sw" style="background:${c}"></span>`}${esc(label)}</span><i>${n(q)}</i></button>`;
+  $("#queues").innerHTML = `<h3>Queues</h3>${btn("all", "Everything", "var(--ink)")}${TEAMS.map((t) => btn(t, NAME[t], colour(t))).join("")}${btn("human", NAME.human, colour("human"))}`;
 }
-resultsReady.then((r) => {
-  const box = $("#hero-stats");
-  if (r.ai) {
-    box.append(stat(`${r.decision.autoRate}%`, "sent straight to a team"),
-      stat(`${r.decision.autoCorrect}%`, "of those were the right team", "green"),
-      stat(`${r.ai.correct}%`, "the AI alone", "text"),
-      stat(`${r.baseline.correct}%`, "the plain model alone", "text"));
-  } else {
-    box.append(stat(`${r.baseline.correct}%`, "the plain model alone"), stat("770", "test messages scored", "text"),
-      stat("7", "teams", "text"), stat("SOON", "AI scoring run", "blue"));
-  }
-}).catch(() => {});
+$("#queues").addEventListener("click", (e) => {
+  const b = e.target.closest(".q");
+  if (!b) return;
+  S.queue = b.dataset.q; S.limit = 30; S.selected = null;
+  drawQueues(); drawList();
+});
+document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+  S.show = b.dataset.show; S.limit = 30; S.selected = null;
+  document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  drawList();
+}));
 
-// ---------------------------------------------------------------- check in a message
-const EXAMPLE_INTENTS = ["compromised_card", "transfer_not_received_by_recipient", "card_swallowed", "exchange_rate", "verify_my_identity", "top_up_failed"];
-const TYPED = ["it still isn't working and nobody is helping me", "Why was I charged twice for one coffee?"];
-inboxReady.then((rows) => {
-  const box = $("#examples");
-  const real = EXAMPLE_INTENTS.map((i) => rows.find((r) => r.intent === i)).filter(Boolean);
-  const chip = (text, cls = "") => {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = `chip ${cls}`.trim(); b.textContent = text; b.title = text;
-    return b;
-  };
-  const rand = chip("Random real message", "rand");
-  rand.addEventListener("click", () => { $("#msg").value = rows[Math.floor(Math.random() * rows.length)].text; route(); });
-  box.append(rand);
-  for (const t of [...real.map((r) => r.text), ...TYPED]) {
-    const b = chip(t);
-    b.addEventListener("click", () => { $("#msg").value = t; route(); });
-    box.append(b);
-  }
-}).catch(() => {});
+// ---------------------------------------------------------------- the inbox list
+function item(r) {
+  const st = r.pending ? `<span class="b normal">Sorting</span>` :
+    `<span class="b ${r.ai?.priority || "normal"}">${esc(r.ai?.priority ? r.ai.priority[0].toUpperCase() + r.ai.priority.slice(1) : "Normal")}</span>` +
+    (r.route === "human" ? `<span class="b person">A person checks</span>` : `<span class="b auto">Sorted automatically</span>`) +
+    (r.mine ? "" : r.route === "human" ? "" : r.route === r.team ? `<span class="b right">✓ Right team</span>` : `<span class="b wrong">✗ Wrong team</span>`);
+  return `<li class="it${r.mine ? " new" : ""}${S.selected === r.id ? " on" : ""}" data-id="${esc(r.id)}" style="--c:${colour(r.pending ? "human" : r.route)}">
+    <button type="button" aria-expanded="${S.selected === r.id}"><div class="a"><span class="tm">${r.pending ? "…" : esc(NAME[r.route])}</span><span>${r.mine ? "just now" : "#" + r.id}</span></div>
+    <p>${esc(r.text)}</p>${st}</button></li>`;
+}
+function drawList() {
+  const rows = visible();
+  $("#list-title").textContent = S.queue === "all" ? "Everything" : NAME[S.queue];
+  const items = $("#items");
+  items.innerHTML = rows.slice(0, S.limit).map(item).join("") ||
+    `<li class="empty">${saved.length ? (S.show === "wrong" ? "No mistakes in this queue." : "Nothing here yet.") : "The AI scoring run hasn't finished yet. Sort your own message above in the meantime."}</li>`;
+  $("#more").hidden = rows.length <= S.limit;
+  $("#more").textContent = `Show more (${rows.length - S.limit} left)`;
+  if (!S.selected && wide.matches && rows[0]) S.selected = rows[0].id, items.firstElementChild?.classList.add("on");
+  drawDetail();
+}
+$("#more").addEventListener("click", () => { S.limit += 30; drawList(); });
+$("#items").addEventListener("click", (e) => {
+  const li = e.target.closest(".it");
+  if (!li || e.target.closest(".det")) return;
+  const id = li.dataset.id;
+  S.selected = !wide.matches && S.selected === id ? null : id;     // on phones, tap again to close
+  $("#items").querySelectorAll(".it").forEach((x) => { x.classList.toggle("on", x.dataset.id === S.selected); x.firstElementChild.setAttribute("aria-expanded", String(x.dataset.id === S.selected)); });
+  drawDetail();
+});
+wide.addEventListener("change", () => drawList());
 
+// ---------------------------------------------------------------- one message in detail
 function highlight(message, evidence, found) {
   if (!found || !evidence) return esc(message);
   const norm = (s) => s.toLowerCase().replace(/[‘’]/g, "'");
-  const i = norm(message).indexOf(norm(evidence).replace(/\s+/g, " ").trim());
+  const e = evidence.replace(/\s+/g, " ").trim(), i = norm(message).indexOf(norm(e));
   if (i < 0) return esc(message);
-  const e = evidence.replace(/\s+/g, " ").trim();
   return esc(message.slice(0, i)) + `<mark>${esc(message.slice(i, i + e.length))}</mark>` + esc(message.slice(i + e.length));
 }
+function detailHTML(r) {
+  if (r.pending) return `<div class="meta">just now</div><div class="msg">${esc(r.text)}</div><p class="loading">Both models are reading it</p>`;
+  const ai = r.ai, held = r.route === "human";
+  const checks = [
+    [ai && ai.team === r.baseline.team, "Both agree", "They disagree"],
+    [ai && ai.confidence >= 0.8, "AI is sure", ai ? `AI only ${pct(ai.confidence)} sure` : "No AI answer"],
+    [ai && ai.evidenceFound, "Quote found", "Quote not in message"],
+  ];
+  return `<div class="meta">${r.mine ? "Your message · just now" : `#${esc(r.id)} · Banking77 test set`}</div>
+    <div class="msg">${highlight(r.text, ai?.evidence, ai?.evidenceFound)}</div>
+    <div class="tiles">
+      <div class="t big${held ? " human" : ""}"><small>${held ? "Held for" : "Sorted to"}</small><strong>${held ? "A person" : esc(NAME[r.route])}</strong></div>
+      <div class="t"><small>Priority</small><strong style="color:${ai?.priority === "urgent" ? "var(--bad)" : "inherit"}">${ai ? esc(ai.priority[0].toUpperCase() + ai.priority.slice(1)) : "-"}</strong></div>
+      <div class="t"><small>AI is</small><strong>${ai ? pct(ai.confidence) + " sure" : "-"}</strong></div>
+    </div>
+    <div class="ops">
+      <div class="op" style="--oc:${colour(ai?.team)}"><small>The AI · Gemini</small>${ai ? `<div class="v">${esc(NAME[ai.team])}</div>
+        <div class="bar"><i style="width:${pct(ai.confidence)}"></i></div><div class="n">${pct(ai.confidence)} sure${ai.reason ? ` · "${esc(ai.reason)}"` : ""}</div>` : `<p class="err">${esc(r.aiError || "No answer")}</p>`}</div>
+      <div class="op" style="--oc:${colour(r.baseline.team)}"><small>The plain model</small><div class="v">${esc(NAME[r.baseline.team])}</div>
+        <div class="bar"><i style="width:${pct(r.baseline.p)}"></i></div><div class="n">${pct(r.baseline.p)}${r.runnerUp ? ` · runner-up ${esc(NAME[r.runnerUp.team])}, ${pct(r.runnerUp.p)}` : ""}</div></div>
+    </div>
+    <div class="why${held ? " held" : ""}">${checks.map(([ok, y, n]) => `<span class="c ${ok ? "y" : "n"}">${ok ? "✓ " + y : "✗ " + n}</span>`).join("")}
+      <em>${held ? "So a person decides where it goes." : "So it went straight to the team."}</em></div>
+    ${r.mine ? `<p class="truth">There's no right answer on file for your own messages.${r.cached ? " This exact message was asked recently, so the AI's saved answer was reused." : ""}</p>`
+      : `<p class="truth">Right answer: <b>${esc(NAME[r.team])}</b> (Banking77 label: ${esc(intentName(r.intent))}). ${r.route === "human" ? "" : r.route === r.team ? "Sorted correctly." : "Sorted to the wrong team."}</p>`}`;
+}
+function drawDetail() {
+  document.querySelectorAll(".it .det").forEach((d) => d.remove());
+  const r = all().find((x) => x.id === S.selected);
+  const pane = $("#detail");
+  if (wide.matches) {
+    pane.hidden = false;
+    pane.style.setProperty("--c", colour(r?.route));
+    pane.innerHTML = r ? detailHTML(r) : `<div class="hint"><h3>Pick a message</h3><p>Or type your own at the top. You'll see both opinions, the checks, and where it went.</p></div>`;
+  } else {
+    pane.hidden = true;
+    const li = r && $(`#items .it[data-id="${CSS.escape(r.id)}"]`);
+    if (li) { const d = document.createElement("div"); d.className = "det"; d.style.setProperty("--c", colour(r.route)); d.innerHTML = detailHTML(r); li.append(d); }
+  }
+}
 
+// ---------------------------------------------------------------- sort your own message
 async function askAI(message) {
   if (!API) throw new Error("No AI server is set up for this copy of the page.");
   const res = await fetch(`${API}/triage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message }) });
@@ -105,125 +140,57 @@ async function askAI(message) {
   if (!res.ok) throw new Error(data.error || `The AI server returned ${res.status}.`);
   return data;
 }
-
-let busy = false;
-async function route() {
-  const message = $("#msg").value.replace(/\s+/g, " ").trim();
-  const pass = $("#pass");
+let n = 0, busy = false;
+async function sortIt(text) {
+  const message = String(text).replace(/\s+/g, " ").trim();
   if (message.length < 3) { $("#msg").focus(); return; }
   if (busy) return;
   busy = true; $("#go").disabled = true;
-  pass.hidden = false;
-  pass.innerHTML = `<div class="loading">Reading the message</div>`;
-  pass.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "nearest" });
+  const r = { id: `you-${++n}`, text: message, mine: true, pending: true, route: "human", baseline: { team: "cards", p: 0 } };
+  mine.unshift(r);
+  S.queue = "all"; S.show = "all"; S.selected = r.id;
+  document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.show === "all")));
+  drawQueues(); drawList();
+  $("#inbox").scrollIntoView({ behavior: still ? "auto" : "smooth", block: "start" });
   await modelReady.catch(() => {});
-  const plain = model ? predict(model, message) : null;
-  let ai = null, aiError = "";
-  try { ai = await askAI(message); } catch (e) { aiError = e.message; }
+  try { r.ai = await askAI(message); r.cached = r.ai.cached; } catch (e) { r.ai = null; r.aiError = e.message; }
+  const plain = model ? predict(model, message) : [{ team: "cards", p: 0 }, { team: "cards", p: 0 }];
+  r.baseline = { team: plain[0].team, p: plain[0].p }; r.runnerUp = plain[1];
+  const d = decide(r.baseline.team, r.ai);
+  r.route = d.route; r.why = d.why; r.pending = false;
   busy = false; $("#go").disabled = false;
-  if (!plain) { pass.innerHTML = `<p class="loading err">The plain model didn't load. Refresh the page and try again.</p>`; return; }
-  const d = decide(plain[0].team, ai);
-  const pct = (p) => `${Math.round(p * 100)}%`;
-  pass.innerHTML = `
-    <div class="pass-msg">${highlight(message, ai?.evidence, ai?.evidenceFound)}</div>
-    <div class="pass-fields">
-      <div class="field gate"><small>Gate</small><span id="f-gate"></span></div>
-      <div class="field"><small>Priority</small><span id="f-pri"></span></div>
-      <div class="field"><small>Status</small><span id="f-st"></span></div>
-    </div>
-    <div class="opinions">
-      <div class="op"><h3>The AI (Gemini)</h3>${ai ? `
-        <div class="team">${esc(NAME[ai.team])}</div>
-        <div class="meter"><i style="width:${Math.round(ai.confidence * 100)}%"></i></div><span>${pct(ai.confidence)} sure</span>
-        <p>${esc(ai.reason)}</p>
-        <p class="check ${ai.evidenceFound ? "yes" : "no"}">${ai.evidenceFound ? "✓ Its quote is in the message (highlighted)" : "✗ Its quote isn't in the message"}</p>` :
-        `<p class="err">${esc(aiError)}</p>`}</div>
-      <div class="op"><h3>The plain model</h3>
-        <div class="team">${esc(NAME[plain[0].team])}</div>
-        <div class="meter"><i style="width:${Math.round(plain[0].p * 100)}%"></i></div><span>${pct(plain[0].p)} probability</span>
-        <p>Runner-up: ${esc(NAME[plain[1].team])} (${pct(plain[1].p)})</p></div>
-    </div>
-    <div class="verdict ${d.route === "human" ? "human" : "auto"}">${d.route === "human"
-      ? `<b>Held for the human desk.</b><ul>${d.why.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>`
-      : `<b>Sent straight to ${esc(NAME[d.route])}.</b> Both opinions agree, the AI is sure, and its quote checks out.`}</div>
-    ${ai?.cached ? `<p class="pass-note">This exact message was asked recently, so the AI's saved answer was reused.</p>` : ""}`;
-  flap($("#f-gate"), GATE[d.route], { cls: d.route === "human" ? "blue" : "" });
-  const pri = ai?.priority || "normal";
-  flap($("#f-pri"), ai ? pri : "-", { cls: pri === "urgent" ? "red" : pri === "high" ? "" : "text" });
-  flap($("#f-st"), d.route === "human" ? "CHECK" : "BOARDING", { cls: d.route === "human" ? "blue" : "green" });
+  drawQueues(); drawList();
 }
-$("#form").addEventListener("submit", (e) => { e.preventDefault(); route(); });
-$("#msg").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); route(); } });
+$("#form").addEventListener("submit", (e) => { e.preventDefault(); sortIt($("#msg").value); });
 
-// ---------------------------------------------------------------- run the inbox
-const MAX_ROWS = 10;
-let queue = [], timer = 0, clockAt = new Date(), tally = { n: 0, ok: 0, bad: 0, hum: 0 };
-const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const status = (r) => r.route === "human" ? ["hum", "HUMAN DESK"] : r.route === r.team ? ["ok", "ON TIME"] : ["bad", "WRONG GATE"];
+// example messages: real ones from the test set, plus two written to be awkward
+const EXAMPLE_INTENTS = ["transfer_not_received_by_recipient", "card_swallowed", "compromised_card", "exchange_rate", "verify_my_identity"];
+const TYPED = ["it still isn't working and nobody is helping me", "Why was I charged twice for one coffee?"];
+function examples(rows) {
+  const box = $("#examples");
+  const chip = (label, text, cls = "") => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = cls; b.textContent = label; b.title = text || label;
+    b.addEventListener("click", () => { const t = text || rows[Math.floor(Math.random() * rows.length)].text; $("#msg").value = t; sortIt(t); });
+    return b;
+  };
+  box.append(chip("Random real message", "", "rand"));
+  for (const t of [...EXAMPLE_INTENTS.map((i) => rows.find((r) => r.intent === i)?.text).filter(Boolean), ...TYPED]) box.append(chip(t, t));
+}
 
-function drawScore() {
-  const t = tally;
-  $("#score").innerHTML = `<span>Departed <b>${t.n}</b></span><span class="ok">On time <b>${t.ok}</b></span><span class="bad">Wrong gate <b>${t.bad}</b></span><span class="hum">Human desk <b>${t.hum}</b></span>`;
-}
-function addRow() {
-  const r = queue.shift();
-  if (!r) { stop(); $("#run").disabled = true; return; }
-  const [cls, label] = status(r);
-  tally.n++; tally[cls]++;
-  clockAt = new Date(clockAt.getTime() + 60000);
-  const li = document.createElement("li");
-  li.className = "row enter";
-  li.innerHTML = `<button type="button" aria-expanded="false">
-      <span class="r-time">${hhmm(clockAt)}</span><span class="r-msg">${esc(r.text)}</span>
-      <span class="r-gate"><span></span></span><span class="r-pri pri ${r.ai.priority}">${r.ai.priority}</span>
-      <span class="r-st"><b class="st ${cls}">${label}</b></span></button>`;
-  flap(li.querySelector(".r-gate span"), GATE[r.route], { cls: r.route === "human" ? "blue" : cls === "bad" ? "red" : "" });
-  li.firstChild.addEventListener("click", () => toggle(li, r));
-  const rows = $("#rows");
-  rows.prepend(li);
-  while (rows.children.length > MAX_ROWS) rows.lastChild.remove();
-  drawScore();
-}
-function toggle(li, r) {
-  const btn = li.firstChild, open = btn.getAttribute("aria-expanded") === "true";
-  btn.setAttribute("aria-expanded", String(!open));
-  li.querySelector(".row-detail")?.remove();
-  if (open) return;
-  const d = document.createElement("div");
-  d.className = "row-detail";
-  d.innerHTML = `<div><small>The AI</small>${esc(NAME[r.ai.team])}, ${Math.round(r.ai.confidence * 100)}% sure${r.ai.evidenceFound ? `, quoting "${esc(r.ai.evidence)}"` : ", quote not found"}</div>
-    <div><small>The plain model</small>${esc(NAME[r.baseline.team])}, ${Math.round(r.baseline.p * 100)}%</div>
-    <div><small>Right answer</small>${esc(NAME[r.team])} (Banking77: ${esc(intentName(r.intent))})${r.why.length ? `<br><small style="margin-top:6px">Held because</small>${r.why.map(esc).join(". ")}` : ""}</div>`;
-  li.append(d);
-}
-function start() { if (timer) return; addRow(); timer = setInterval(addRow, still ? 900 : 1700); $("#run").textContent = "Pause"; }
-function stop() { clearInterval(timer); timer = 0; $("#run").textContent = "Start"; }
-function reset(rows) {
-  stop(); queue = shuffle(rows.filter((r) => r.ai)); tally = { n: 0, ok: 0, bad: 0, hum: 0 }; clockAt = new Date();
-  $("#rows").innerHTML = ""; $("#run").disabled = !queue.length; drawScore();
-}
 inboxReady.then((rows) => {
-  const scored = rows.filter((r) => r.ai);
-  if (!scored.length) {
-    $("#board-empty").hidden = false;
-    $("#board-empty").textContent = "The AI scoring run hasn't finished yet. Once it has, every message here is replayed with its saved answers.";
-    $("#run").disabled = $("#more").disabled = true;
-    drawScore();
-    return;
-  }
-  reset(rows);
-  $("#run").addEventListener("click", () => (timer ? stop() : start()));
-  $("#more").addEventListener("click", () => { reset(rows); start(); });
-  // start by itself the first time the board comes into view
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { start(); io.disconnect(); } }, { threshold: 0.35 });
-    io.observe($(".board"));
-  }
-}).catch(() => { $("#board-empty").hidden = false; $("#board-empty").textContent = "The saved messages didn't load. Refresh to try again."; });
+  // a fixed shuffle, so every team turns up near the top rather than the dataset's order
+  let seed = 77;
+  const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  saved = rows.filter((r) => r.ai).map((r) => ({ ...r, id: String(r.id), k: rand() })).sort((a, b) => a.k - b.k);
+  examples(rows);
+  drawQueues(); drawList();
+}).catch(() => { drawQueues(); drawList(); });
 
 // ---------------------------------------------------------------- results
-const bar = (label, value, n, extra = "") => `<div class="bar"><span class="lab">${label}</span><span class="tr"><i style="width:${value ?? 0}%"></i>${extra}</span><span class="val">${value ?? "-"}%${n != null ? ` <span class="n">(${n})</span>` : ""}</span></div>`;
+const bar = (label, value, c, extra = "", count) => `<div class="br" style="--c:${c}"><span class="lab">${label}</span><span class="tr"><i style="width:${value ?? 0}%"></i>${extra}</span><span class="val">${value ?? "-"}%${count != null ? ` <small>(${count})</small>` : ""}</span></div>`;
 resultsReady.then((r) => {
+  $("#tag").textContent = r.scored ? `Banking77 · ${r.scored} scored` : "Banking77";
   const body = $("#results-body");
   if (!r.ai) {
     body.innerHTML = `<div class="pending">The plain model is scored: <b>${r.baseline.correct}%</b> of the 770 messages to the right team
@@ -232,31 +199,29 @@ resultsReady.then((r) => {
     return;
   }
   const d = r.decision, c = r.confidenceOnly;
+  $("#results-sub").textContent = `${r.scored} test messages, 10 from each of Banking77's 77 request types. Model ${r.model}, prompt ${r.prompt}.`;
   body.innerHTML = `
-    <div class="big">
-      <div class="stat"><span></span><p>of messages sent straight to a team</p></div>
-      <div class="stat"><span></span><p>of those reached the right team</p></div>
-      <div class="stat"><span></span><p>held for a person instead</p></div>
-      <div class="stat"><span></span><p>the AI's quote really was in the message</p></div>
+    <div class="big4">
+      <div class="k fill"><strong>${d.autoRate}%</strong><span>sorted automatically</span></div>
+      <div class="k"><strong style="color:var(--ok)">${d.autoCorrect}%</strong><span>of those reached the right team</span></div>
+      <div class="k"><strong>${d.humanRate}%</strong><span>held for a person instead</span></div>
+      <div class="k"><strong>${r.ai.evidenceFound}%</strong><span>of the AI's quotes really were in the message</span></div>
     </div>
     <div class="callout">
       <p><b>Agreement catches what confidence misses.</b> Trusting the AI whenever it said it was at least 80% sure would have sent
-        ${c.autoWrong} messages to the wrong team. Also requiring the plain model to agree let ${d.autoWrong} through, while still routing ${d.autoRate}% automatically.</p>
+        ${c.autoWrong} messages to the wrong team. Also requiring the plain model to agree let ${d.autoWrong} through, while still sorting ${d.autoRate}% automatically.</p>
       <p>Alone, the AI put ${r.ai.correct}% of messages in the right team and the plain model ${r.baseline.correct}%. The plain model has seen
-        10,000 messages like these; the AI has seen none, which is why it helps most on messages that don't look like the training set.</p>
+        10,000 messages like these; the AI has seen none.</p>
     </div>
     <div class="charts">
       <div class="chart"><h3>Can its "how sure" be trusted?</h3><p>How often the AI was right, grouped by how sure it said it was.</p>
-        <div class="bars">${r.calibration.filter((b) => b.n).map((b) => bar(`${Math.round(b.from * 100)}-${Math.round(b.to * 100)}%`, b.correct, b.n)).join("")}</div></div>
-      <div class="chart"><h3>Right team, by team</h3><p>The AI (amber) and the plain model (grey).</p>
-        <div class="bars">${r.perTeam.map((t) => bar(esc(NAME[t.team]).replace(" and ", " & "), t.ai, null, `<i class="b" style="width:${t.baseline}%"></i>`)).join("")}</div>
-        <div class="keys"><span><i style="background:var(--amber)"></i>The AI</span><span><i style="background:#5B6372"></i>Plain model</span></div></div>
-      <div class="chart"><h3>Where the AI went wrong</h3><p>Its most common wrong gates, out of ${r.scored} messages.</p>
-        <ul class="mix">${r.confusions.map((m) => `<li><span>${esc(NAME[m.from])} → ${esc(NAME[m.to])}</span><b>${m.n}</b></li>`).join("") || "<li>None</li>"}</ul></div>
+        <div class="bars">${r.calibration.filter((b) => b.n).map((b) => bar(`${Math.round(b.from * 100)} to ${Math.round(b.to * 100)}% sure`, b.correct, "var(--ink)", "", b.n)).join("")}</div></div>
+      <div class="chart"><h3>Right team, by team</h3><p>The AI (thick bar) and the plain model (thin grey bar).</p>
+        <div class="bars">${r.perTeam.map((t) => bar(esc(NAME[t.team]), t.ai, colour(t.team), `<i class="b" style="width:${t.baseline}%"></i>`)).join("")}</div>
+        <div class="keys"><span><i style="background:var(--ink)"></i>The AI</span><span><i style="background:#A9A9B0"></i>Plain model</span></div></div>
+      <div class="chart"><h3>Where the AI went wrong</h3><p>Its most common wrong teams, out of ${r.scored} messages.</p>
+        <ul class="mix">${r.confusions.map((m) => `<li><span class="pair"><span class="dot" style="background:${colour(m.from)}"></span>${esc(NAME[m.from])} → <span class="dot" style="background:${colour(m.to)}"></span>${esc(NAME[m.to])}</span><b>${m.n}</b></li>`).join("") || "<li>None</li>"}</ul></div>
       <div class="chart"><h3>Priority</h3><p>Did the AI flag the urgent ones?</p>
-        <div class="bars">${bar("Urgent caught", r.ai.urgentCaught, null)}${bar("Exact match", r.ai.priorityExact, null)}</div></div>
+        <div class="bars">${bar("Urgent caught", r.ai.urgentCaught, "var(--fraud)")}${bar("Exact match", r.ai.priorityExact, "var(--ink)")}</div></div>
     </div>`;
-  const s = body.querySelectorAll(".big .stat > span");
-  flap(s[0], `${d.autoRate}%`); flap(s[1], `${d.autoCorrect}%`, { cls: "green" }); flap(s[2], `${d.humanRate}%`, { cls: "blue" }); flap(s[3], `${r.ai.evidenceFound}%`, { cls: "text" });
-  $("#results-sub").textContent = `${r.scored} test messages, 10 from each of Banking77's 77 request types. Model ${r.model}, prompt ${r.prompt}.`;
-}).catch(() => { $("#results-body").innerHTML = `<p class="err">The results didn't load. Refresh to try again.</p>`; });
+}).catch(() => { $("#results-body").innerHTML = `<p class="pending">The results didn't load. Refresh to try again.</p>`; });
