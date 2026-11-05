@@ -51,6 +51,9 @@ const results = {
     autoWrong: count(auto, (r) => r.route !== r.team), humanRate: pct(scored.length - auto.length, scored.length),
   } : null,
   confidenceOnly: scored.length ? { autoRate: pct(confOnly.length, scored.length), autoWrong: count(confOnly, (r) => r.ai.team !== r.team) } : null,
+  // The fair test: the plain model alone, sending on its most confident messages, as many as the rule did
+  plainOnly: scored.length ? (() => { const top = [...scored].sort((a, b) => b.baseline.p - a.baseline.p).slice(0, auto.length);
+    return { autoRate: pct(top.length, scored.length), autoWrong: count(top, (r) => r.baseline.team !== r.team) }; })() : null,
   calibration: buckets,
   perTeam: teams.map((t) => { const xs = scored.filter((r) => r.team === t), all = rows.filter((r) => r.team === t);
     return { team: t, n: all.length, ai: pct(count(xs, (r) => r.ai.team === t), xs.length), baseline: pct(count(all, (r) => r.baseline.team === t), all.length) }; }),

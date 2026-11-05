@@ -28,6 +28,10 @@
   "autoRate": 97.5,
   "autoWrong": 64
  },
+ "plainOnly": {
+  "autoRate": 87.3,
+  "autoWrong": 4
+ },
  "calibration": [
   {
    "from": 0,

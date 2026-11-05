@@ -24,6 +24,13 @@ Unlike the first version of this project, nothing here is written by me: the mes
 
 The AI is scored on 770 test messages, 10 from each of the 77 request types, through the same code the live demo uses ([worker/src/triage.js](worker/src/triage.js)). The results, and every message with both opinions and the right answer, are in [site/data/](site/data/). The plain model gets 96.2% of all 3,080 test messages into the right team; it has seen 10,000 messages just like them, so the interesting questions are how often the AI and the plain model agree, how often they're both wrong together, and whether the AI's confidence means anything. The page answers all three.
 
+What the first full run found (Gemini 3 Flash, prompt v3):
+
+- The rule sent 87.3% of messages straight to a team, and 99.1% of those were right (6 wrong out of 672).
+- Trusting the AI whenever it said it was at least 80% sure would have sent 64 to the wrong team. Its confidence is loosely calibrated: messages it rated 80 to 90% sure were right only 61% of the time.
+- Alone, the AI got 90.4% right and the plain model 96.1%. Most of the AI's misses are on Transfers (70%), where it often picks Top-ups for top-ups made by bank transfer. My team grouping says Transfers; the AI's reading is defensible.
+- The catch: the plain model alone, sending only its 672 most confident messages, let 4 wrong ones through. On this data the AI doesn't make routing safer than a model trained on 10,000 labelled examples. What it adds is a quoted reason a person can check, and it works with no training data, which is the realistic case for a new inbox.
+
 ## Run it
 
 ```bash

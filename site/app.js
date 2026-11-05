@@ -212,6 +212,9 @@ resultsReady.then((r) => {
         ${c.autoWrong} messages to the wrong team. Also requiring the plain model to agree let ${d.autoWrong} through, while still sorting ${d.autoRate}% automatically.</p>
       <p>Alone, the AI put ${r.ai.correct}% of messages in the right team and the plain model ${r.baseline.correct}%. The plain model has seen
         10,000 messages like these; the AI has seen none.</p>
+      ${r.plainOnly ? `<p><b>The honest catch:</b> the plain model on its own, sending only its ${r.plainOnly.autoRate}% most confident messages,
+        let ${r.plainOnly.autoWrong} through. On this data the AI doesn't make routing safer than a well-trained model. What it adds is a
+        quoted reason a person can check, and it needs no training data, which matters for a new inbox with no labelled history.</p>` : ""}
     </div>
     <div class="charts">
       <div class="chart"><h3>Can its "how sure" be trusted?</h3><p>How often the AI was right, grouped by how sure it said it was.</p>
