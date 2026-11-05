@@ -3,90 +3,147 @@
  "prompt": "v3",
  "threshold": 0.8,
  "sample": 770,
- "scored": 0,
+ "scored": 770,
  "baseline": {
   "correct": 96.1,
   "testAccuracyAll": 0.9617
  },
- "ai": null,
- "agree": null,
- "decision": null,
- "confidenceOnly": null,
+ "ai": {
+  "correct": 90.4,
+  "evidenceFound": 99.4,
+  "priorityExact": 85.8,
+  "urgentCaught": 95
+ },
+ "agree": {
+  "rate": 89,
+  "correctWhenAgree": 99
+ },
+ "decision": {
+  "autoRate": 87.3,
+  "autoCorrect": 99.1,
+  "autoWrong": 6,
+  "humanRate": 12.7
+ },
+ "confidenceOnly": {
+  "autoRate": 97.5,
+  "autoWrong": 64
+ },
  "calibration": [
   {
    "from": 0,
    "to": 0.5,
-   "n": 0,
-   "correct": null
+   "n": 1,
+   "correct": 100
   },
   {
    "from": 0.5,
    "to": 0.8,
-   "n": 0,
-   "correct": null
+   "n": 18,
+   "correct": 44.4
   },
   {
    "from": 0.8,
    "to": 0.9,
-   "n": 0,
-   "correct": null
+   "n": 66,
+   "correct": 60.6
   },
   {
    "from": 0.9,
    "to": 0.95,
-   "n": 0,
-   "correct": null
+   "n": 178,
+   "correct": 89.3
   },
   {
    "from": 0.95,
    "to": 1,
-   "n": 0,
-   "correct": null
+   "n": 507,
+   "correct": 96.3
   }
  ],
  "perTeam": [
   {
    "team": "cards",
    "n": 260,
-   "ai": null,
+   "ai": 87.7,
    "baseline": 98.8
   },
   {
    "team": "account",
    "n": 90,
-   "ai": null,
+   "ai": 98.9,
    "baseline": 98.9
   },
   {
    "team": "cash",
    "n": 50,
-   "ai": null,
+   "ai": 100,
    "baseline": 94
   },
   {
    "team": "top_ups",
    "n": 90,
-   "ai": null,
+   "ai": 97.8,
    "baseline": 95.6
   },
   {
    "team": "transfers",
    "n": 100,
-   "ai": null,
+   "ai": 70,
    "baseline": 91
   },
   {
    "team": "fees_fx",
    "n": 120,
-   "ai": null,
+   "ai": 95,
    "baseline": 94.2
   },
   {
    "team": "fraud",
    "n": 60,
-   "ai": null,
+   "ai": 95,
    "baseline": 95
   }
  ],
- "confusions": []
+ "confusions": [
+  {
+   "from": "transfers",
+   "to": "top_ups",
+   "n": 16
+  },
+  {
+   "from": "cards",
+   "to": "top_ups",
+   "n": 15
+  },
+  {
+   "from": "transfers",
+   "to": "cards",
+   "n": 8
+  },
+  {
+   "from": "cards",
+   "to": "account",
+   "n": 7
+  },
+  {
+   "from": "transfers",
+   "to": "fees_fx",
+   "n": 6
+  },
+  {
+   "from": "cards",
+   "to": "fees_fx",
+   "n": 6
+  },
+  {
+   "from": "fraud",
+   "to": "cash",
+   "n": 2
+  },
+  {
+   "from": "fees_fx",
+   "to": "cards",
+   "n": 2
+  }
+ ]
 }
