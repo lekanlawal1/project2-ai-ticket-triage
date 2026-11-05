@@ -64,8 +64,13 @@ export async function askGemini(key, message, fetchImpl = fetch) {
   };
   let last = "Gemini did not answer";
   for (let attempt = 0; attempt < 4; attempt++) {
-    const res = await fetchImpl(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
-      method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key }, body: JSON.stringify(body) });
+    let res;
+    try {
+      res = await fetchImpl(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+        method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key }, body: JSON.stringify(body) });
+    } catch (err) {   // the connection dropped: worth another try, like a rate limit
+      last = `Couldn't reach Gemini (${err.message})`; await new Promise((r) => setTimeout(r, 1500 * 2 ** attempt)); continue;
+    }
     if (res.status === 429 || res.status >= 500) { last = `Gemini returned HTTP ${res.status}`; await new Promise((r) => setTimeout(r, 1500 * 2 ** attempt)); continue; }
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(`Gemini returned HTTP ${res.status}`);

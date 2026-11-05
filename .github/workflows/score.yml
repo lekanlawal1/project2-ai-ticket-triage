@@ -5,7 +5,7 @@ name: Score the AI
 on:
   workflow_dispatch:
   schedule:
-    - cron: "41 6 * * *"
+    - cron: "41 9 * * *"     # after the free tier's daily limit resets (midnight Pacific)
 permissions:
   contents: write
   actions: write      # to start the site deploy after committing new results
@@ -26,15 +26,32 @@ jobs:
         run: |
           if [ -z "$GEMINI_API_KEY" ]; then echo "::notice::GEMINI_API_KEY isn't set yet"; exit 0; fi
           node pipeline/run_gemini.mjs
-      - name: Rescore
-        run: node pipeline/evaluate.mjs
-      - name: Commit the answers and results
-        run: |
-          git add data/gemini_results.jsonl site/data/ 2>/dev/null || true
-          if git diff --cached --quiet; then echo "Nothing new"; exit 0; fi
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Scoring run: $(wc -l < data/gemini_results.jsonl) of 770 messages answered"
-          git push
-          # a push made by a workflow doesn't start other workflows, so start the site deploy directly
-          gh workflow run deploy-site.yml --ref main
+      - name: Keep a copy of the answers whatever happens next
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gemini-answers
+          path: data/gemini_results.jsonl
+          if-no-files-found: ignore
+      - name: Rescore on top of the latest main and commit
         env:
           GH_TOKEN: ${{ github.token }}
+        run: |
+          # main may have moved on while the run was asking Gemini: start from the latest main,
+          # put the answers back, rescore, and commit. Retried in case it moves again.
+          cp data/gemini_results.jsonl /tmp/answers.jsonl 2>/dev/null || { echo "No answers yet"; exit 0; }
+          for attempt in 1 2 3; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            cp /tmp/answers.jsonl data/gemini_results.jsonl
+            node pipeline/evaluate.mjs > /dev/null
+            git add data/gemini_results.jsonl site/data/
+            if git diff --cached --quiet; then echo "Nothing new"; exit 0; fi
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "Scoring run: $(wc -l < data/gemini_results.jsonl) of 770 messages answered"
+            if git push -q origin HEAD:main; then
+              # a push made by a workflow doesn't start other workflows, so start the site deploy directly
+              gh workflow run deploy-site.yml --ref main
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Couldn't push after 3 tries; the answers are in the gemini-answers artifact"; exit 1

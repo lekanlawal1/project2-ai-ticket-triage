@@ -46,3 +46,14 @@ test("the Worker only answers the demo page, and wants a message", async () => {
   r = await worker.fetch(new Request("https://w/health"), env, ctx);
   assert.equal((await r.json()).ok, true);
 });
+
+test("a dropped connection is retried, not counted as an answer", async () => {
+  let calls = 0;
+  const flaky = async () => {
+    if (++calls === 1) throw new TypeError("fetch failed");
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify({ team: "cash", priority: "high", confidence: 0.9, evidence: "the ATM kept my card", reason: "card swallowed" }) }] } }] }), { status: 200 });
+  };
+  const out = await askGemini("k", "Help, the ATM kept my card", flaky);
+  assert.equal(calls, 2);
+  assert.equal(out.team, "cash");
+});
