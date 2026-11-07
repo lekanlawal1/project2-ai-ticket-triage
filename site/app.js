@@ -3,6 +3,10 @@
 import { load, predict } from "./baseline.js";
 import { decide } from "./rule.js";
 
+// drawn icons instead of text symbols
+const CHECK = '<svg class="ic" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.2 6.4l2.4 2.4 5.2-5.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CROSS = '<svg class="ic" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M3.2 3.2l5.6 5.6M8.8 3.2L3.2 8.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
 const API = window.TRIAGE_API;
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -56,7 +60,7 @@ function item(r) {
   const st = r.pending ? `<span class="b normal">Sorting</span>` :
     `<span class="b ${r.ai?.priority || "normal"}">${esc(r.ai?.priority ? r.ai.priority[0].toUpperCase() + r.ai.priority.slice(1) : "Normal")}</span>` +
     (r.route === "human" ? `<span class="b person">A person checks</span>` : `<span class="b auto">Sorted automatically</span>`) +
-    (r.mine ? "" : r.route === "human" ? "" : r.route === r.team ? `<span class="b right">✓ Right team</span>` : `<span class="b wrong">✗ Wrong team</span>`);
+    (r.mine ? "" : r.route === "human" ? "" : r.route === r.team ? `<span class="b right">${CHECK}Right team</span>` : `<span class="b wrong">${CROSS}Wrong team</span>`);
   return `<li class="it${r.mine ? " new" : ""}${S.selected === r.id ? " on" : ""}" data-id="${esc(r.id)}" style="--c:${colour(r.pending ? "human" : r.route)}">
     <button type="button" aria-expanded="${S.selected === r.id}"><div class="a"><span class="tm">${r.pending ? "…" : esc(NAME[r.route])}</span><span>${r.mine ? "just now" : "#" + r.id}</span></div>
     <p>${esc(r.text)}</p>${st}</button></li>`;
@@ -112,7 +116,7 @@ function detailHTML(r) {
       <div class="op" style="--oc:${colour(r.baseline.team)}"><small>The plain model</small><div class="v">${esc(NAME[r.baseline.team])}</div>
         <div class="bar"><i style="width:${pct(r.baseline.p)}"></i></div><div class="n">${pct(r.baseline.p)}${r.runnerUp ? ` · runner-up ${esc(NAME[r.runnerUp.team])}, ${pct(r.runnerUp.p)}` : ""}</div></div>
     </div>
-    <div class="why${held ? " held" : ""}">${checks.map(([ok, y, n]) => `<span class="c ${ok ? "y" : "n"}">${ok ? "✓ " + y : "✗ " + n}</span>`).join("")}
+    <div class="why${held ? " held" : ""}">${checks.map(([ok, y, n]) => `<span class="c ${ok ? "y" : "n"}">${ok ? CHECK + y : CROSS + n}</span>`).join("")}
       <em>${held ? "So a person decides where it goes." : "So it went straight to the team."}</em></div>
     ${r.mine ? `<p class="truth">There's no right answer on file for your own messages.${r.cached ? " This exact message was asked recently, so the AI's saved answer was reused." : ""}</p>`
       : `<p class="truth">Right answer: <b>${esc(NAME[r.team])}</b> (Banking77 label: ${esc(intentName(r.intent))}). ${r.route === "human" ? "" : r.route === r.team ? "Sorted correctly." : "Sorted to the wrong team."}</p>`}`;

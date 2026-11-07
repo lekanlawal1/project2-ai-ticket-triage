@@ -182,3 +182,6 @@ h1 { margin: 0; font: 700 clamp(2.1rem, 7.5vw, 3.4rem)/1 var(--display); letter-
 .limits ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: .92rem; }
 .limits li + li { margin-top: 5px; }
 .foot { border-top: 1px solid var(--line); padding: 20px 16px 50px; color: var(--muted); font-size: .85rem; text-align: center; background: var(--panel); }
+
+/* drawn check and cross icons */
+.ic { display: inline-block; vertical-align: -1px; margin-right: 5px; }
