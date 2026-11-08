@@ -185,3 +185,7 @@ h1 { margin: 0; font: 700 clamp(2.1rem, 7.5vw, 3.4rem)/1 var(--display); letter-
 
 /* drawn check and cross icons */
 .ic { display: inline-block; vertical-align: -1px; margin-right: 5px; }
+
+/* the way to "your own messages" */
+.top nav a.own-link { display: inline; color: var(--ink); font-weight: 600; }
+.own-cta { margin: 12px 0 0; font-size: .95rem; } .own-cta a { font-weight: 600; }

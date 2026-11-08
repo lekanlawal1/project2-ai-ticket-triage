@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sorted: would AI routing work on your messages? | Lekan Lawal</title>
+<meta name="description" content="Bring your support desk's teams and past messages. Sorted trains a plain model on your history in your browser, asks an AI about a sample, and shows how often routing would have been right.">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='7' cy='16' r='5' fill='%23FF3B30'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%232F6BFF'/%3E%3Ccircle cx='25' cy='16' r='5' fill='%23FFB800'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="own.css">
+<script src="https://lekanlawal1.github.io/portfolio-site/portfolio-bar.js" data-project="sorted" defer></script>
+<script src="config.js"></script>
+<script src="https://lekanlawal1.github.io/portfolio-site/warp.js"></script>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="index.html" aria-label="Sorted, the Banking77 demo"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Sorted</a>
+  <span class="tag">Your messages</span>
+  <nav aria-label="Sections"><a href="index.html">Bank demo</a><a href="#start">Your messages</a><a href="#real">Using it for real</a></nav>
+</header>
+
+<section class="hero">
+  <div class="hero-in own-hero">
+    <div>
+      <h1>Would it work on your messages?</h1>
+      <p>Bring your support desk's teams and some past messages. Sorted learns your history in your browser, asks the AI
+        about a sample, and shows how often it would have routed them right, and where it would have gone wrong, before
+        anyone switches anything on.</p>
+    </div>
+    <ol class="flow" aria-label="The four steps">
+      <li><b>Messages</b><span>A CSV export, or paste them in</span></li>
+      <li><b>Teams</b><span>A name and one line each</span></li>
+      <li><b>Run</b><span>Personal details hidden first</span></li>
+      <li><b>Report</b><span>How often it's right, and why not</span></li>
+    </ol>
+  </div>
+</section>
+
+<main class="own" id="start">
+  <!-- 1. messages -->
+  <section class="step" id="s1" aria-labelledby="s1-title">
+    <div class="step-h"><span class="num">1</span><div><h2 id="s1-title">Your messages</h2>
+      <p>Export past messages from your helpdesk as a CSV. Include the team each one went to if you can: then Sorted can tell
+        you how often it's right, not just how often it's sure. Up to 5,000 rows are used.</p></div></div>
+    <div class="drop" id="drop">
+      <label class="pick"><input type="file" id="file" accept=".csv,.tsv,.txt,text/csv,text/plain"><span>Choose a CSV</span></label>
+      <span class="or">or</span>
+      <button type="button" class="ghost" id="sample">Try it with 770 sample bank messages</button>
+      <details class="paste"><summary>Paste messages instead</summary>
+        <textarea id="pasted" rows="6" placeholder="One message per line, or paste CSV with a header row"></textarea>
+        <button type="button" class="ghost" id="use-paste">Use these</button></details>
+    </div>
+    <div id="cols" class="cols" hidden></div>
+  </section>
+
+  <!-- 2. teams -->
+  <section class="step" id="s2" aria-labelledby="s2-title" hidden>
+    <div class="step-h"><span class="num">2</span><div><h2 id="s2-title">Your teams</h2>
+      <p>The AI only knows your teams from these lines, so say what each one handles and where the line is with its
+        neighbours. 2 to 12 teams.</p></div></div>
+    <ol class="teams" id="teams"></ol>
+    <div class="row-btns"><button type="button" class="ghost" id="add-team">Add a team</button>
+      <button type="button" class="ghost" id="bank-teams">Use the bank example's seven teams</button></div>
+    <p class="warn" id="team-warn" hidden></p>
+  </section>
+
+  <!-- 3. check and run -->
+  <section class="step" id="s3" aria-labelledby="s3-title" hidden>
+    <div class="step-h"><span class="num">3</span><div><h2 id="s3-title">Check and run</h2></div></div>
+    <div id="plan" class="plan"></div>
+    <label class="consent"><input type="checkbox" id="ok"> These are messages I'm allowed to share with Google's Gemini (with the details above hidden).</label>
+    <div class="row-btns"><button type="button" class="go" id="run" disabled>Run it</button><button type="button" class="ghost" id="stop" hidden>Stop</button></div>
+    <div class="prog" id="prog" hidden><div class="pbar"><i id="pfill"></i></div><p id="ptext" aria-live="polite"></p></div>
+  </section>
+
+  <!-- 4. report -->
+  <section class="step" id="s4" aria-labelledby="s4-title" hidden>
+    <div class="step-h"><span class="num">4</span><div><h2 id="s4-title">What it would have done</h2><p id="r-sub"></p></div></div>
+    <div id="report"></div>
+  </section>
+</main>
+
+<section class="how" id="real" aria-labelledby="real-title">
+  <div class="sec-in">
+    <h2 id="real-title" class="h2">Using it for real</h2>
+    <p class="sub">This page is a trial: it tells you whether AI routing would be safe on your messages. Running it on every
+      new message is a bigger job. Here is what changes, and why.</p>
+    <ol class="steps real">
+      <li><b>Connect the helpdesk.</b> Zendesk, Freshdesk or a shared inbox sends each new message to a small server, which
+        sets the team and leaves an internal note with the reason. Nobody copies CSVs around.</li>
+      <li><b>Your own AI account, paid.</b> This demo uses Gemini's free tier, which Google may use to improve its products.
+        Real customer messages need a paid account (Google Cloud's Montreal region keeps data in Canada) and a check against
+        PIPEDA and your own policies.</li>
+      <li><b>Shadow mode first.</b> For two to four weeks it only suggests, as a note, and people route as usual. Comparing its
+        suggestions with what people did is the real test. Automatic routing waits until those numbers hold up.</li>
+      <li><b>Learn from corrections.</b> When someone moves a message to another team, that's recorded and the plain model is
+        retrained weekly on the latest history.</li>
+      <li><b>Watch for drift.</b> A new product or outage changes what customers write about. A weekly accuracy check, with an
+        alert when it drops, catches that before customers do.</li>
+      <li><b>Keep a record.</b> Every decision, both opinions and the reason, kept for review, so any routing can be explained
+        after the fact.</li>
+    </ol>
+    <div class="limits">
+      <h3>What to keep in mind about this trial</h3>
+      <ul>
+        <li>Your file is read and the plain model is trained in your browser. Only the sample of up to 200 messages goes to the AI,
+          through a small server of mine, with emails, links, postcodes and long numbers hidden first. Nothing is stored.</li>
+        <li>The AI part uses Gemini's free tier, so don't upload messages you aren't allowed to share with Google.</li>
+        <li>A few hundred labelled messages give a rough answer. The fewer examples a team has, the weaker the plain model is for
+          that team, and the more messages will be held for a person.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <p>Built by <a href="https://lekanlawal1.github.io/portfolio-site/">Lekan Lawal</a> · <a href="https://github.com/lekanlawal1/project2-ai-ticket-triage">Code and method</a> ·
+    <a href="index.html">The Banking77 demo</a></p>
+</footer>
+
+<script type="module" src="own.js"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "50d455a6ac424591b8acaa97dc3975a9"}'></script>
+</body>
+</html>

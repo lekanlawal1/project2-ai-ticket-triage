@@ -9,4 +9,10 @@ name = "RATE_LIMITER"
 namespace_id = "1004"
 simple = { limit = 10, period = 60 }
 
+# Bring your own teams: 12 batches (of up to 10 messages) per minute per visitor
+[[ratelimits]]
+name = "BATCH_LIMITER"
+namespace_id = "1005"
+simple = { limit = 12, period = 60 }
+
 # GEMINI_API_KEY is set as an encrypted secret by the deploy workflow, never in this file.

@@ -14,6 +14,21 @@ A support desk spends minutes per message just deciding who should handle it. An
 2. **A plain model reads it too.** TF-IDF and logistic regression, trained on Banking77's 10,003 training messages. It runs in the visitor's browser and never sees the AI's answer.
 3. **Code decides.** A message goes straight to a team only when both pick the same team, the AI is at least 80% sure, and its quote checks out. Everything else goes to a person, with the reasons. The 80% bar was set before scoring and isn't tuned on the results.
 
+## Your own messages
+
+[own.html](https://lekanlawal1.github.io/project2-ai-ticket-triage/own.html) runs the same method on a support desk's own teams and history, as a trial before anyone switches anything on:
+
+1. **Messages:** a CSV export (or pasted text), up to 5,000 rows, ideally with the team each message really went to.
+2. **Teams:** 2 to 12, a name and one line each. The AI only knows the teams from these lines.
+3. **Run:** the plain model is trained in the browser on most of the labelled history ([site/train.js](site/train.js): the same TF-IDF and logistic regression as `pipeline/baseline.py`, which matches scikit-learn on the same split). Up to 200 held-out messages go to Gemini in batches of 10, through the Worker's `/triage-batch`, with emails, links, postcodes and long numbers hidden first ([site/redact.js](site/redact.js)). The decision is the demo's own `rule.js`.
+4. **Report:** how many would have been sent automatically, how many of those were right, the plain model alone at the same coverage, why messages were held, which teams the AI confuses, and every message, as a CSV too.
+
+Without a team column it still shows what it would do, but says plainly that it can't score itself, and the plain model only has the team descriptions to learn from.
+
+### Using it for real
+
+The page is a trial. Routing every new message needs: a helpdesk connection (a webhook in, the team and an internal note back out); a paid AI account rather than the free tier, with data kept in Canada; a few weeks of shadow mode, where it only suggests; retraining from agents' corrections; a weekly accuracy check for drift; and a record of every decision.
+
 ## The data
 
 [Banking77](https://github.com/PolyAI-LDN/task-specific-datasets) (PolyAI, CC BY 4.0): 13,083 customer messages to a bank, each labelled by people with one of 77 request types. I grouped the 77 types into seven teams a bank's support desk would have (Cards, Transfers, Top-ups, Cash and ATMs, Fees and exchange, Account and identity, Fraud and security) and set priorities by request type, before running any model. The grouping is in [pipeline/teams.py](pipeline/teams.py).
