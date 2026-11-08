@@ -87,31 +87,21 @@
 <section class="how" id="real" aria-labelledby="real-title">
   <div class="sec-in">
     <h2 id="real-title" class="h2">Using it for real</h2>
-    <p class="sub">This page is a trial: it tells you whether AI routing would be safe on your messages. Running it on every
-      new message is a bigger job. Here is what changes, and why.</p>
-    <ol class="steps real">
-      <li><b>Connect the helpdesk.</b> Zendesk, Freshdesk or a shared inbox sends each new message to a small server, which
-        sets the team and leaves an internal note with the reason. Nobody copies CSVs around.</li>
-      <li><b>Your own AI account, paid.</b> This demo uses Gemini's free tier, which Google may use to improve its products.
-        Real customer messages need a paid account (Google Cloud's Montreal region keeps data in Canada) and a check against
-        PIPEDA and your own policies.</li>
-      <li><b>Shadow mode first.</b> For two to four weeks it only suggests, as a note, and people route as usual. Comparing its
-        suggestions with what people did is the real test. Automatic routing waits until those numbers hold up.</li>
-      <li><b>Learn from corrections.</b> When someone moves a message to another team, that's recorded and the plain model is
-        retrained weekly on the latest history.</li>
-      <li><b>Watch for drift.</b> A new product or outage changes what customers write about. A weekly accuracy check, with an
-        alert when it drops, catches that before customers do.</li>
-      <li><b>Keep a record.</b> Every decision, both opinions and the reason, kept for review, so any routing can be explained
-        after the fact.</li>
-    </ol>
+    <p class="sub">This page is a trial. Routing every new message would take six more things.</p>
+    <ul class="needs">
+      <li><b>Helpdesk link</b><span>New messages come in from Zendesk or Freshdesk; the team and a note go back.</span></li>
+      <li><b>Paid AI account</b><span>Not the free tier, with data kept in Canada.</span></li>
+      <li><b>Shadow mode</b><span>A few weeks of suggestions only, checked against what people did.</span></li>
+      <li><b>Retraining</b><span>Weekly, from agents' corrections.</span></li>
+      <li><b>Drift check</b><span>Weekly accuracy, with an alert when it drops.</span></li>
+      <li><b>Decision log</b><span>Every routing, with both opinions and the reason.</span></li>
+    </ul>
     <div class="limits">
-      <h3>What to keep in mind about this trial</h3>
+      <h3>Before you upload</h3>
       <ul>
-        <li>Your file is read and the plain model is trained in your browser. Only the sample of up to 200 messages goes to the AI,
-          through a small server of mine, with emails, links, postcodes and long numbers hidden first. Nothing is stored.</li>
-        <li>The AI part uses Gemini's free tier, so don't upload messages you aren't allowed to share with Google.</li>
-        <li>A few hundred labelled messages give a rough answer. The fewer examples a team has, the weaker the plain model is for
-          that team, and the more messages will be held for a person.</li>
+        <li>Your file stays in your browser. Only up to 200 messages go to the AI, with emails, links, postcodes and long numbers hidden first. Nothing is stored.</li>
+        <li>The AI is Gemini's free tier, so only upload messages you're allowed to share with Google.</li>
+        <li>A few hundred labelled messages give a rough answer. Teams with few examples get more messages held for a person.</li>
       </ul>
     </div>
   </div>
