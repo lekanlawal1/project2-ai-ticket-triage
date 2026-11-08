@@ -12,9 +12,26 @@ export function sniff(text) {
   return best;
 }
 
+const lines = (src) => src.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).map((l) => [l]);
+
+// Pasted messages often contain commas. Read the text as a spreadsheet only when the first row
+// looks like a header (short labels) and most rows have the same number of columns.
+export function looksTabular(rows) {
+  if (rows.length < 2 || rows[0].length < 2) return false;
+  const width = rows[0].length;
+  const headerOk = rows[0].every((h) => h.trim().length <= 40 && h.trim().split(/\s+/).length <= 5);
+  const same = rows.slice(1).filter((r) => r.length === width).length / (rows.length - 1);
+  return headerOk && same >= 0.8;
+}
+
 export function parse(text, sep = sniff(text)) {
   const src = String(text).replace(/^﻿/, "");
-  if (!sep) return src.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).map((l) => [l]);
+  if (!sep) return lines(src);
+  const rows = parseWith(src, sep);
+  return looksTabular(rows) ? rows : lines(src);
+}
+
+function parseWith(src, sep) {
   const rows = []; let row = [], field = "", q = false;
   for (let i = 0; i < src.length; i++) {
     const ch = src[i];

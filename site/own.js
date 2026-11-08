@@ -167,7 +167,7 @@ function refresh() {
        have done, but not how often it's right. The plain model only has your team descriptions to learn from, so it's weak, and more messages will be held for a person.
        Add a column with the team each message went to (40 or more) for a real score.</div>`) +
     (thin.length ? `<p class="warn">Few examples for ${thin.map((t) => `<b>${esc(t.name)}</b> (${P.trainCount.get(t.id)})`).join(", ")}: the plain model will be unsure there, so more of their messages will be held.</p>` : "") +
-    `<div class="sent"><b>Sent to the AI:</b> ${P.sample.length} messages, in ${batches} batches of up to ${BATCH} (about ${mins} minute${mins > 1 ? "s" : ""}).
+    `<div class="sent"><b>Sent to the AI:</b> ${P.sample.length} message${P.sample.length === 1 ? "" : "s"}, in ${batches} batch${batches === 1 ? "" : "es"} of up to ${BATCH} (about ${mins} minute${mins > 1 ? "s" : ""}).
      ${hid ? `Hidden first: ${hid}.` : "Nothing needed hiding in these messages."} Everything else stays in your browser.
      ${P.examples.length ? `<ul class="ex-hidden">${P.examples.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}</div>`;
   $("run").disabled = !$("ok").checked;

@@ -18,6 +18,8 @@ test("CSV: quoted separators, doubled quotes and line breaks inside a field", ()
   assert.equal(sniff("a;b;c\n1;2;3"), ";");
   assert.equal(sniff("text\tqueue"), "\t");
   assert.deepEqual(parse("one message\nanother one\n"), [["one message"], ["another one"]], "no separators: one message per line");
+  assert.deepEqual(parse("My invoice is wrong, please check\nI can't log in\nRefund, please"), [["My invoice is wrong, please check"], ["I can't log in"], ["Refund, please"]],
+    "pasted sentences with commas stay whole messages");
   assert.equal(toCSV([["a,b", 'say "hi"'], ["c", "d"]]), '"a,b","say ""hi"""\r\nc,d');
 });
 
