@@ -1,74 +1,42 @@
-# Sorted: AI ticket triage for bank support
+# Sorted
 
-**Live demo:** https://lekanlawal1.github.io/project2-ai-ticket-triage/ · **Stack:** Gemini (structured output) · scikit-learn · JavaScript · Cloudflare Workers · GitHub Actions
+Routes bank support messages to the right team, but only when an AI and a plain model agree. When they don't, a person decides.
 
-Type a message a bank customer might send and watch it get sorted to one of seven support teams, or held for a person. Or browse 770 real test messages by queue, with the right answer for each, and filter to just the mistakes.
+[Try it](https://lekanlawal1.github.io/project2-ai-ticket-triage/) · [Try it on your own messages](https://lekanlawal1.github.io/project2-ai-ticket-triage/own.html)
 
-## The problem
+![A message box above an inbox of test messages sorted into seven team queues](docs/screenshot.jpg)
 
-A support desk spends minutes per message just deciding who should handle it. An AI can do that first pass in a second, but it's an unreliable part: it can be confidently wrong, and its own "how sure am I" doesn't catch that. The previous version of this project proved the point: it filed complaints that mentioned money as billing at 95% confidence, and the confidence check never noticed.
+## Why I built it
+
+The first version of this project filed angry complaints as billing questions at 95% confidence, and nothing flagged it. An AI's confidence in itself isn't something you can rely on, so I wanted a second opinion that doesn't come from the same AI.
 
 ## How it works
 
-1. **The AI reads the message.** Gemini returns a team, a priority, how sure it is, and the words that decided it, in a fixed JSON shape it can't step outside. Code checks that the quoted words are really in the message.
-2. **A plain model reads it too.** TF-IDF and logistic regression, trained on Banking77's 10,003 training messages. It runs in the visitor's browser and never sees the AI's answer.
-3. **Code decides.** A message goes straight to a team only when both pick the same team, the AI is at least 80% sure, and its quote checks out. Everything else goes to a person, with the reasons. The 80% bar was set before scoring and isn't tuned on the results.
+Gemini picks a team and quotes the words that decided it. A small text classifier (TF-IDF and logistic regression), trained on 10,000 real bank messages, picks one too. It runs in your browser and never sees the AI's answer. A message is sent on only if both agree, the AI is at least 80% sure and its quote is really in the message. Otherwise it waits for a person, with the reasons. I set the 80% bar before scoring anything.
 
-## Your own messages
+The messages come from Banking77, a public set of 13,083 real customer messages labelled by people. I grouped its 77 request types into seven teams a bank would have, before running any model. None of the test data is mine, so anyone can check the scores.
 
-[own.html](https://lekanlawal1.github.io/project2-ai-ticket-triage/own.html) runs the same method on a support desk's own teams and history, as a trial before anyone switches anything on:
+## What I found
 
-1. **Messages:** a CSV export (or pasted text), up to 5,000 rows, ideally with the team each message really went to.
-2. **Teams:** 2 to 12, a name and one line each. The AI only knows the teams from these lines.
-3. **Run:** the plain model is trained in the browser on most of the labelled history ([site/train.js](site/train.js): the same TF-IDF and logistic regression as `pipeline/baseline.py`, which matches scikit-learn on the same split). Up to 200 held-out messages go to Gemini in batches of 10, through the Worker's `/triage-batch`, with emails, links, postcodes and long numbers hidden first ([site/redact.js](site/redact.js)). The decision is the demo's own `rule.js`.
-4. **Report:** how many would have been sent automatically, how many of those were right, the plain model alone at the same coverage, why messages were held, which teams the AI confuses, and every message, as a CSV too.
+On 770 test messages, 87% were sorted automatically and 99% of those went to the right team (6 mistakes out of 672). Trusting the AI's confidence on its own would have sent 64 to the wrong team.
 
-Without a team column it still shows what it would do, but says plainly that it can't score itself, and the plain model only has the team descriptions to learn from.
+The surprising part: with 10,000 examples to learn from, the plain model was just as safe on its own. The AI earns its place when a team has much less history. On the "your own messages" page, with only 577 past messages to train on, requiring the AI to agree let 6 fewer mistakes through than the plain model alone. Most support desks have hundreds of past messages, not tens of thousands.
 
-### Using it for real
+## Trying it on your own messages
 
-The page is a trial. Routing every new message needs: a helpdesk connection (a webhook in, the team and an internal note back out); a paid AI account rather than the free tier, with data kept in Canada; a few weeks of shadow mode, where it only suggests; retraining from agents' corrections; a weekly accuracy check for drift; and a record of every decision.
-
-## The data
-
-[Banking77](https://github.com/PolyAI-LDN/task-specific-datasets) (PolyAI, CC BY 4.0): 13,083 customer messages to a bank, each labelled by people with one of 77 request types. I grouped the 77 types into seven teams a bank's support desk would have (Cards, Transfers, Top-ups, Cash and ATMs, Fees and exchange, Account and identity, Fraud and security) and set priorities by request type, before running any model. The grouping is in [pipeline/teams.py](pipeline/teams.py).
-
-Unlike the first version of this project, nothing here is written by me: the messages and their labels are someone else's, so the scores can be checked.
-
-## Scoring
-
-The AI is scored on 770 test messages, 10 from each of the 77 request types, through the same code the live demo uses ([worker/src/triage.js](worker/src/triage.js)). The results, and every message with both opinions and the right answer, are in [site/data/](site/data/). The plain model gets 96.2% of all 3,080 test messages into the right team; it has seen 10,000 messages just like them, so the interesting questions are how often the AI and the plain model agree, how often they're both wrong together, and whether the AI's confidence means anything. The page answers all three.
-
-What the first full run found (Gemini 3 Flash, prompt v3):
-
-- The rule sent 87.3% of messages straight to a team, and 99.1% of those were right (6 wrong out of 672).
-- Trusting the AI whenever it said it was at least 80% sure would have sent 64 to the wrong team. Its confidence is loosely calibrated: messages it rated 80 to 90% sure were right only 61% of the time.
-- Alone, the AI got 90.4% right and the plain model 96.1%. Most of the AI's misses are on Transfers (70%), where it often picks Top-ups for top-ups made by bank transfer. My team grouping says Transfers; the AI's reading is defensible.
-- The catch: the plain model alone, sending only its 672 most confident messages, let 4 wrong ones through. On this data the AI doesn't make routing safer than a model trained on 10,000 labelled examples. What it adds is a quoted reason a person can check, and it works with no training data, which is the realistic case for a new inbox.
+The second page is a trial for a real support desk. You upload past messages as a CSV, describe your teams in a line each, and it trains the plain model in your browser, sends up to 200 messages to the AI with emails, links and long numbers hidden first, and reports how many would have been routed automatically and how many of those were right. It doesn't connect to a helpdesk. Running it on live messages would need that, plus a paid AI account and a few weeks where it only suggests.
 
 ## Run it
 
 ```bash
 pip install -r pipeline/requirements.txt
-python pipeline/baseline.py                          # train the plain model, export site/data/baseline.json
-python pipeline/sample.py                            # the fixed 770-message scoring sample
-GEMINI_API_KEY=... node pipeline/run_gemini.mjs      # ask Gemini (resumable; free tier is fine)
-node pipeline/evaluate.mjs                           # score, write site/data/results.json and inbox.json
-node --test tests/*.test.mjs worker/test/*.test.mjs  # tests
-cd site && python -m http.server 8800                # the page, at http://localhost:8800
+python pipeline/baseline.py                          # train the plain model
+GEMINI_API_KEY=... node pipeline/run_gemini.mjs      # ask Gemini about the 770 test messages
+node pipeline/evaluate.mjs                           # score both
+node --test tests/*.test.mjs worker/test/*.test.mjs
+cd site && python -m http.server 8800                # http://localhost:8800
 ```
 
-## Layout
+## More
 
-```
-pipeline/teams.py        the seven teams and which request types each handles
-pipeline/baseline.py     trains and exports the plain model
-pipeline/sample.py       the 770-message scoring sample
-pipeline/run_gemini.mjs  the scoring run (same code as the live demo)
-pipeline/evaluate.mjs    scores everything with the page's own code
-worker/                  the Cloudflare Worker that holds the Gemini key
-site/                    the page: baseline.js (plain model), rule.js (the decision), app.js
-tests/                   the browser model matches Python on all 3,080 test messages; the decision rule
-```
-
-The first version (synthetic tickets, Streamlit) is in the git history.
+[docs/details.md](docs/details.md) has the full write-up: the scoring, where the AI goes wrong, the trial page step by step, and what using it for real would take.
