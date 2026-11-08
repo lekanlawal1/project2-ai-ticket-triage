@@ -102,6 +102,9 @@ function renderTeams() {
         <input aria-label="What ${esc(t.name || "this team")} handles" maxlength="220" value="${esc(t.description)}" data-i="${i}" data-k="description" placeholder="What this team handles, in one line"></div>
       ${S.colTeam >= 0 ? `<span class="cnt">${(c.get(t.from) || 0).toLocaleString("en-CA")}</span>` : ""}
       <button type="button" class="x" data-del="${i}" aria-label="Remove ${esc(t.name || "this team")}">${CROSS}</button></li>`).join("");
+  warnTeams();
+}
+function warnTeams() {
   const warn = [];
   if (S.teams.length < 2) warn.push("Add at least two teams.");
   if (S.extraValues) warn.push(`Your file has ${S.extraValues} more team${S.extraValues > 1 ? "s" : ""} beyond the 12 most common; their messages are left out.`);
@@ -113,9 +116,8 @@ $("teams").addEventListener("input", (e) => {
   const el = e.target.closest("[data-k]"); if (!el) return;
   const t = S.teams[+el.dataset.i]; t[el.dataset.k] = el.value;
   if (el.dataset.k === "name" && S.colTeam < 0) t.from = el.value.toLowerCase();
-  fixIds(); save(); refresh();
+  fixIds(); save(); warnTeams(); refresh();
 });
-$("teams").addEventListener("change", () => renderTeams());
 $("teams").addEventListener("click", (e) => { const b = e.target.closest("[data-del]"); if (!b) return; S.teams.splice(+b.dataset.del, 1); fixIds(); save(); renderTeams(); refresh(); });
 $("add-team").addEventListener("click", () => { S.teams.push({ name: "", description: "", from: "" }); fixIds(); renderTeams(); $("teams").lastElementChild.querySelector("input").focus(); });
 $("bank-teams").addEventListener("click", () => { S.teams = BANK.map(([name, description]) => ({ name, description, from: name.toLowerCase() })); fixIds(); save(); renderTeams(); refresh(); });
@@ -207,7 +209,11 @@ $("run").addEventListener("click", async () => {
     chunk.forEach((it, k) => {
       const ai = answers[k] && !answers[k].error ? answers[k] : null;
       const plain = predict(model, it.text);
-      out.push({ ...it, ai, aiError: ai ? null : (answers[k]?.error || "No answer"), plain: plain[0], plain2: plain[1], ...decide(plain[0].team, ai) });
+      // a near tie means none of the message's words told the plain model anything: no opinion
+      const none = plain[0].p - plain[1].p < 0.02;
+      const d = none ? decide(ai ? ai.team : null, ai) : decide(plain[0].team, ai);
+      if (none) { d.route = "human"; d.why = ["The plain model had nothing to go on", ...d.why]; }
+      out.push({ ...it, ai, aiError: ai ? null : (answers[k]?.error || "No answer"), plain: plain[0], plainNone: none, ...d });
     });
   }
   progress(1, S.stop ? `Stopped after ${out.length} messages` : `Done: ${out.length} messages`);
@@ -226,7 +232,7 @@ function renderReport() {
   const sent = R.filter((r) => r.route !== "human"), held = n - sent.length;
   const right = sent.filter((r) => r.route === r.truth).length, wrong = sent.length - right;
   const aiOk = R.filter((r) => r.ai), aiFailed = n - aiOk.length;
-  const agree = R.filter((r) => r.ai && r.ai.team === r.plain.team).length;
+  const agree = R.filter((r) => r.ai && !r.plainNone && r.ai.team === r.plain.team).length;
   $("r-sub").textContent = `${n} messages${S.stop ? " (stopped early)" : ""}, ${scored ? "scored against the team each one really went to" : "with no answers to score against"}.`;
   // the honest comparison: the plain model alone, sending the same number of messages it was most sure of
   const plainTop = [...R].sort((a, b) => b.plain.p - a.plain.p).slice(0, sent.length);
@@ -298,7 +304,7 @@ function renderRows() {
     return `<li><p class="m">${esc(r.sent)}</p><div class="ops2">
         ${scored ? `<span><small>Right team</small>${chip(r.truth)}</span>` : ""}
         <span><small>AI</small>${r.ai ? `${chip(r.ai.team)} <i>${Math.round(r.ai.confidence * 100)}%</i>` : `<em class="err">${esc(r.aiError)}</em>`}</span>
-        <span><small>Plain model</small>${chip(r.plain.team)} <i>${Math.round(r.plain.p * 100)}%</i></span></div>
+        <span><small>Plain model</small>${r.plainNone ? `<em class="err">No opinion</em>` : `${chip(r.plain.team)} <i>${Math.round(r.plain.p * 100)}%</i>`}</span></div>
       <div class="dec">${sentTo ? `<span class="b auto">Sent to ${esc(T(r.route).name)}</span>${status}` : `<span class="b person">Held for a person</span><span class="whyl">${r.why.map(esc).join(" · ")}</span>`}</div></li>`;
   }).join("") || `<li class="none">Nothing here.</li>`;
   $("more-rows").hidden = list.length <= shown;
@@ -307,7 +313,7 @@ function exportCSV() {
   const scored = S.plan.mode === "labelled";
   const rows = [["message_as_sent", ...(scored ? ["right_team"] : []), "ai_team", "ai_confidence", "ai_priority", "ai_quote", "quote_in_message", "ai_reason", "plain_team", "plain_confidence", "decision", "held_because"]];
   for (const r of S.results) rows.push([r.sent, ...(scored ? [T(r.truth).name] : []), r.ai ? T(r.ai.team).name : "", r.ai ? r.ai.confidence : "", r.ai?.priority || "", r.ai?.evidence || "",
-    r.ai ? (r.ai.evidenceFound ? "yes" : "no") : "", r.ai?.reason || r.aiError || "", T(r.plain.team).name, r.plain.p.toFixed(3), r.route === "human" ? "held for a person" : `sent to ${T(r.route).name}`, r.why.join("; ")]);
+    r.ai ? (r.ai.evidenceFound ? "yes" : "no") : "", r.ai?.reason || r.aiError || "", r.plainNone ? "no opinion" : T(r.plain.team).name, r.plainNone ? "" : r.plain.p.toFixed(3), r.route === "human" ? "held for a person" : `sent to ${T(r.route).name}`, r.why.join("; ")]);
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([toCSV(rows)], { type: "text/csv" }));
   a.download = "sorted-trial.csv"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
