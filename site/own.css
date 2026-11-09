@@ -22,6 +22,7 @@ button.ghost:disabled { opacity: .45; cursor: not-allowed; }
 .pick { position: relative; } .pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 .pick span { background: var(--ink); color: #fff; border-color: var(--ink); }
 .drop { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px; border: 1px dashed #C9C9CF; border-radius: 14px; background: var(--bg); }
+.privacy { margin: 8px 2px 0; font-size: .8rem; color: var(--muted); max-width: 80ch; }
 .drop .or { color: var(--muted); font-size: .85rem; }
 .paste { flex-basis: 100%; } .paste summary { cursor: pointer; color: var(--ink-2); font-weight: 500; font-size: .9rem; }
 .paste textarea { display: block; width: 100%; margin: 8px 0; border: 1px solid var(--line); border-radius: 11px; padding: 10px; font: 400 .9rem var(--ui); resize: vertical; }
